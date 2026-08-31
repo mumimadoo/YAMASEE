@@ -1,0 +1,109 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Database and media files
+data/
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+data/media/
+data/cache/
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# App temporary cache and storage
+cache/
+logs/
+scratch/
+_backup_before_auth_history/
+edge-profile/
+artifacts/
+
+# Media files in static/
+static/*.mp4
+static/*.wav
+
+# Executables
+*.exe
+
+# Frontend dependencies
+node_modules/
+
+# Runtime media and temporary files
+temp_vad_*.wav
+*.wav
+*.mp3
+*.mp4
+*.m4a
+*.webm
+
+# User analysis data
+analysis_history/
+
+# User spreadsheet data
+datalist.xlsx
+
+# Security scan output
+pip-audit-report.json
+
+# Local documents and exports
+*.pdf
+
+# Backups
+backups/
+
+# Database WAL and SHM files
+*.db-wal
+*.db-shm
+data/*.db-wal
+data/*.db-shm
+
+# Temporary files
+*.tmp
+*.temp
+upload_raw.tmp
+scratch_*
+*.bak
+*.old
+
+# Secrets and API keys
+*secret*
+*key*
+secrets/
+compose.yaml
+
+# IDE Settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.user
+
+# Screenshots and Test reports
+screenshots/
+*.png
+*.jpg
+*.jpeg
+!static/Logo_boy.png

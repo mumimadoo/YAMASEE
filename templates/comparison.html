@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="day">
+<head>
+    {% include "partials/auth_theme_script.html" %}
+    {% include "partials/auth_head.html" %}
+    <title>เปรียบเทียบวิดีโอ - YAMASEE Media Intelligence</title>
+    <link rel="stylesheet" href="/static/css/auth-shared.css?v=1.3.0">
+    <link rel="stylesheet" href="/static/css/comparison.css?v=1.5.1">
+    <link rel="stylesheet" href="/static/css/night-glass-ui.css?v=1.0.0">
+    <script src="/static/js/comparison.js?v=1.5.3" defer></script>
+
+    <!-- Pre-load public_id for deep linking if provided -->
+    {% if comparison_public_id %}
+    <meta name="comparison-public-id" content="{{ comparison_public_id }}">
+    {% endif %}
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <a href="/landing" class="brand-logo">
+            <img src="/static/Logo_boy.png" alt="YAMASEE Logo">
+            <span>YAMASEE</span>
+        </a>
+        <div class="nav-actions">
+            {% include "partials/user_popover.html" %}
+            <a href="/landing" class="btn btn-outline"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/dashboard" class="btn btn-outline"><span class="nav-text-effect" data-text="Dashboard"><span class="nav-text-base">Dashboard</span><span class="nav-text-hover" aria-hidden="true">Dashboard</span></span></a>
+            <a href="/comparison" class="btn btn-outline active"><span class="nav-text-effect" data-text="Compare"><span class="nav-text-base">Compare</span><span class="nav-text-hover" aria-hidden="true">Compare</span></span></a>
+            <a href="/comparison/history" class="btn btn-outline"><span class="nav-text-effect" data-text="Comparison History"><span class="nav-text-base">Comparison History</span><span class="nav-text-hover" aria-hidden="true">Comparison History</span></span></a>
+            {% if user and (user.role in ['admin', 'owner'] or user.is_admin) %}
+            <a href="/admin" class="btn btn-outline"><span class="nav-text-effect" data-text="Admin"><span class="nav-text-base">Admin</span><span class="nav-text-hover" aria-hidden="true">Admin</span></span></a>
+            {% endif %}
+            <button type="button" id="logoutBtn" class="btn btn-outline btn-logout"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% include "partials/theme_switch.html" %}
+        </div>
+    </header>
+
+    <main class="comparison-page-wrapper">
+        <div class="comparison-container">
+
+            <!-- Hero Title Section -->
+            <div class="comparison-hero">
+                <div class="hero-badge">
+                    <span> YAMASEE </span>
+                </div>
+                <h1 class="hero-title"></h1>
+                <p class="hero-subtitle">เปรียบเทียบเนื้อหา มุมมอง ความเหมือน ความแตกต่าง และหลักฐานจาก transcript วิดีโอสองรายการ</p>
+            </div>
+
+            <!-- Top Selection Workspace -->
+            <section class="selection-workspace">
+                <div class="video-cards-grid">
+                    
+                    <!-- Video A Card -->
+                    <div class="video-selection-card" id="cardA" data-slot="A">
+                        <div class="slot-badge slot-a">VIDEO A</div>
+                        
+                        <!-- Unselected State -->
+                        <div class="slot-unselected" id="unselectedA">
+                            <div class="unselected-header">
+                                <div class="unselected-icon">🎬</div>
+                                <h3>เลือกวิดีโอ A</h3>
+                            </div>
+                            
+                            <!-- History choice -->
+                            <div class="slot-input-block">
+                                <button type="button" class="btn btn-primary select-btn" id="btnSelectA">
+                                    ➕ เลือกจากประวัติ
+                                </button>
+                            </div>
+
+                            <div class="slot-divider"><span>หรือ</span></div>
+
+                            <!-- URL input choice -->
+                            <div class="slot-input-block">
+                                <label for="urlInputA" class="slot-input-label">🔗 YouTube / TikTok URL</label>
+                                <div class="slot-input-row">
+                                    <input type="url" id="urlInputA" class="form-input slot-url-input" placeholder="วางลิงก์ YouTube หรือ TikTok ที่นี่..." autocomplete="off">
+                                    <button type="button" class="btn btn-secondary btn-submit-url" id="btnSubmitUrlA">ใช้วิดีโอนี้</button>
+                                </div>
+                            </div>
+
+                            <div class="slot-divider"><span>หรือ</span></div>
+
+                            <!-- MP4 upload choice -->
+                            <div class="slot-input-block">
+                                <label class="slot-input-label">📁 อัปโหลด MP4</label>
+                                <div class="slot-file-row">
+                                    <input type="file" id="fileInputA" accept=".mp4,.webm,.mov,.avi,.mkv,.mp3,.wav,.m4a" style="display: none;">
+                                    <button type="button" class="btn btn-outline btn-choose-file" id="btnChooseFileA">
+                                        📂 เลือกไฟล์ MP4
+                                    </button>
+                                    <span class="file-name-tag" id="fileNameA" style="display: none;"></span>
+                                    <button type="button" class="btn btn-secondary btn-submit-file" id="btnSubmitFileA" style="display: none;">ใช้วิดีโอนี้</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cache Notice State (Video A) -->
+                        <div class="slot-cache-notice" id="cacheNoticeA" style="display: none; padding: 1rem 0;">
+                            <div class="alert-banner alert-info" style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                ℹ️ พบวิดีโอนี้ในประวัติการวิเคราะห์แล้ว
+                            </div>
+                            <div class="cache-action-btns" style="display: flex; gap: 0.5rem; justify-content: center;">
+                                <button type="button" class="btn btn-primary btn-use-cache" id="btnUseCacheA">⚡ ใช้ผลเดิม</button>
+                                <button type="button" class="btn btn-outline btn-reanalyze" id="btnReanalyzeA">🔄 วิเคราะห์ใหม่</button>
+                            </div>
+                        </div>
+
+                        <!-- Model Selection State (Video A) -->
+                        <div class="slot-model-config" id="modelConfigA" style="display: none; padding: 0.5rem 0;">
+                            <div class="model-selector-box card-inner" style="padding: 1rem;">
+                                <label for="modelSelectA" class="slot-input-label font-semibold" style="display: block; margin-bottom: 0.35rem; font-size: 0.9rem;">
+                                    🤖 โมเดลสำหรับวิเคราะห์
+                                </label>
+                                <select id="modelSelectA" class="form-select slot-model-select" style="width: 100%; margin-bottom: 0.5rem; padding: 0.45rem 0.65rem; border-radius: 8px; font-size: 0.9rem;">
+                                    <option value="gemini-3.5-flash" selected>gemini-3.5-flash</option>
+                                    <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                                    <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                                </select>
+                                <p class="model-help-notice" style="font-size: 0.75rem; color: var(--text-desc); margin-bottom: 0.75rem;">
+                                    ℹ️ หากโมเดลที่เลือกถูกจำกัดการใช้งาน ระบบจะสลับไปยังโมเดลสำรองโดยอัตโนมัติ
+                                </p>
+                                <div class="model-action-row" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                    <button type="button" class="btn btn-secondary btn-cancel-model" id="btnCancelModelA">ยกเลิก</button>
+                                    <button type="button" class="btn btn-primary btn-start-analysis" id="btnStartAnalysisA">🚀 เริ่มวิเคราะห์</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processing State -->
+                        <div class="slot-processing" id="processingA" style="display: none;">
+                            <div class="processing-spinner"></div>
+                            <h4 class="processing-stage-text" id="stageTitleA">กำลังเตรียมวิดีโอ...</h4>
+                            <div class="slot-progress-bar">
+                                <div class="slot-progress-fill" id="progressFillA" style="width: 0%;"></div>
+                            </div>
+                            <div class="processing-meta-info">
+                                <span id="progressTextA">0%</span> • <span id="queueNoticeA">ระบบกำลังถอดคำพูดและวิเคราะห์</span>
+                            </div>
+                        </div>
+
+                        <!-- Failed State -->
+                        <div class="slot-failed" id="failedA" style="display: none;">
+                            <div class="failed-badge-icon">⚠️</div>
+                            <h4 class="failed-title">วิเคราะห์ไม่สำเร็จ</h4>
+                            <p class="failed-error-msg" id="errorMsgA">--</p>
+                            <div class="failed-action-btns">
+                                <button type="button" class="btn btn-outline btn-retry" id="btnRetryA">ลองใหม่</button>
+                                <button type="button" class="btn btn-secondary btn-change-failed" id="btnChangeFailedA">เปลี่ยนวิดีโอ</button>
+                            </div>
+                        </div>
+
+                        <!-- Selected State -->
+                        <div class="slot-selected" id="selectedA" style="display: none;">
+                            <div class="video-thumb-wrapper">
+                                <img id="thumbA" src="/static/Logo_boy.png" alt="Thumbnail Video A" class="video-thumb">
+                                <span class="source-tag" id="sourceTypeA">MP4</span>
+                            </div>
+                            <div class="video-info">
+                                <h3 id="titleA" class="video-title">--</h3>
+                                <div class="video-meta">
+                                    <span id="durationA">--:--</span> • 
+                                    <span id="dateA">--</span>
+                                </div>
+                                <div class="status-ready">✓ พร้อมเปรียบเทียบ</div>
+                            </div>
+                            <button type="button" class="btn btn-outline btn-change" id="btnChangeA">
+                                เปลี่ยนคลิป
+                            </button>
+                        </div>
+
+                        <!-- Status Notice Row (Video A) -->
+                        <div class="compact-estimate-row slot-a-estimate" id="compactEstimateA" style="display: none;">
+                            <div class="estimate-pill-badge" id="estimateBadgeA">✓ ใช้ผลวิเคราะห์เดิม — ไม่มีการวิเคราะห์คลิปซ้ำ</div>
+                        </div>
+                    </div>
+
+                    <!-- VS Badge -->
+                    <div class="vs-divider">
+                        <div class="vs-circle">VS</div>
+                    </div>
+
+                    <!-- Video B Card -->
+                    <div class="video-selection-card" id="cardB" data-slot="B">
+                        <div class="slot-badge slot-b">VIDEO B</div>
+                        
+                        <!-- Unselected State -->
+                        <div class="slot-unselected" id="unselectedB">
+                            <div class="unselected-header">
+                                <h3>เลือกวิดีโอ B</h3>
+                            </div>
+                            
+                            <!-- History choice -->
+                            <div class="slot-input-block">
+                                <button type="button" class="btn btn-primary select-btn" id="btnSelectB">
+                                    ➕ เลือกจากประวัติ
+                                </button>
+                            </div>
+
+                            <div class="slot-divider"><span>หรือ</span></div>
+
+                            <!-- URL input choice -->
+                            <div class="slot-input-block">
+                                <label for="urlInputB" class="slot-input-label">🔗 YouTube / TikTok URL</label>
+                                <div class="slot-input-row">
+                                    <input type="url" id="urlInputB" class="form-input slot-url-input" placeholder="วางลิงก์ YouTube หรือ TikTok ที่นี่..." autocomplete="off">
+                                    <button type="button" class="btn btn-secondary btn-submit-url" id="btnSubmitUrlB">ใช้วิดีโอนี้</button>
+                                </div>
+                            </div>
+
+                            <div class="slot-divider"><span>หรือ</span></div>
+
+                            <!-- MP4 upload choice -->
+                            <div class="slot-input-block">
+                                <label class="slot-input-label">📁 อัปโหลด MP4</label>
+                                <div class="slot-file-row">
+                                    <input type="file" id="fileInputB" accept=".mp4,.webm,.mov,.avi,.mkv,.mp3,.wav,.m4a" style="display: none;">
+                                    <button type="button" class="btn btn-outline btn-choose-file" id="btnChooseFileB">
+                                        📂 เลือกไฟล์ MP4
+                                    </button>
+                                    <span class="file-name-tag" id="fileNameB" style="display: none;"></span>
+                                    <button type="button" class="btn btn-secondary btn-submit-file" id="btnSubmitFileB" style="display: none;">ใช้วิดีโอนี้</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cache Notice State (Video B) -->
+                        <div class="slot-cache-notice" id="cacheNoticeB" style="display: none; padding: 1rem 0;">
+                            <div class="alert-banner alert-info" style="margin-bottom: 0.75rem; font-size: 0.9rem;">
+                                ℹ️ พบวิดีโอนี้ในประวัติการวิเคราะห์แล้ว
+                            </div>
+                            <div class="cache-action-btns" style="display: flex; gap: 0.5rem; justify-content: center;">
+                                <button type="button" class="btn btn-primary btn-use-cache" id="btnUseCacheB">⚡ ใช้ผลเดิม</button>
+                                <button type="button" class="btn btn-outline btn-reanalyze" id="btnReanalyzeB">🔄 วิเคราะห์ใหม่</button>
+                            </div>
+                        </div>
+
+                        <!-- Model Selection State (Video B) -->
+                        <div class="slot-model-config" id="modelConfigB" style="display: none; padding: 0.5rem 0;">
+                            <div class="model-selector-box card-inner" style="padding: 1rem;">
+                                <label for="modelSelectB" class="slot-input-label font-semibold" style="display: block; margin-bottom: 0.35rem; font-size: 0.9rem;">
+                                    🤖 โมเดลสำหรับวิเคราะห์
+                                </label>
+                                <select id="modelSelectB" class="form-select slot-model-select" style="width: 100%; margin-bottom: 0.5rem; padding: 0.45rem 0.65rem; border-radius: 8px; font-size: 0.9rem;">
+                                    <option value="gemini-3.5-flash" selected>gemini-3.5-flash</option>
+                                    <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                                    <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                                </select>
+                                <p class="model-help-notice" style="font-size: 0.75rem; color: var(--text-desc); margin-bottom: 0.75rem;">
+                                    ℹ️ หากโมเดลที่เลือกถูกจำกัดการใช้งาน ระบบจะสลับไปยังโมเดลสำรองโดยอัตโนมัติ
+                                </p>
+                                <div class="model-action-row" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                    <button type="button" class="btn btn-secondary btn-cancel-model" id="btnCancelModelB">ยกเลิก</button>
+                                    <button type="button" class="btn btn-primary btn-start-analysis" id="btnStartAnalysisB">🚀 เริ่มวิเคราะห์</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processing State -->
+                        <div class="slot-processing" id="processingB" style="display: none;">
+                            <div class="processing-spinner"></div>
+                            <h4 class="processing-stage-text" id="stageTitleB">กำลังเตรียมวิดีโอ...</h4>
+                            <div class="slot-progress-bar">
+                                <div class="slot-progress-fill" id="progressFillB" style="width: 0%;"></div>
+                            </div>
+                            <div class="processing-meta-info">
+                                <span id="progressTextB">0%</span> • <span id="queueNoticeB">ระบบกำลังถอดคำพูดและวิเคราะห์</span>
+                            </div>
+                        </div>
+
+                        <!-- Failed State -->
+                        <div class="slot-failed" id="failedB" style="display: none;">
+                            <div class="failed-badge-icon">⚠️</div>
+                            <h4 class="failed-title">วิเคราะห์ไม่สำเร็จ</h4>
+                            <p class="failed-error-msg" id="errorMsgB">--</p>
+                            <div class="failed-action-btns">
+                                <button type="button" class="btn btn-outline btn-retry" id="btnRetryB">ลองใหม่</button>
+                                <button type="button" class="btn btn-secondary btn-change-failed" id="btnChangeFailedB">เปลี่ยนวิดีโอ</button>
+                            </div>
+                        </div>
+
+                        <!-- Selected State -->
+                        <div class="slot-selected" id="selectedB" style="display: none;">
+                            <div class="video-thumb-wrapper">
+                                <img id="thumbB" src="/static/Logo_boy.png" alt="Thumbnail Video B" class="video-thumb">
+                                <span class="source-tag" id="sourceTypeB">YouTube</span>
+                            </div>
+                            <div class="video-info">
+                                <h3 id="titleB" class="video-title">--</h3>
+                                <div class="video-meta">
+                                    <span id="durationB">--:--</span> • 
+                                    <span id="dateB">--</span>
+                                </div>
+                                <div class="status-ready">✓ พร้อมเปรียบเทียบ</div>
+                            </div>
+                            <button type="button" class="btn btn-outline btn-change" id="btnChangeB">
+                                เปลี่ยนคลิป
+                            </button>
+                        </div>
+
+                        <!-- Status Notice Row (Video B) -->
+                        <div class="compact-estimate-row slot-b-estimate" id="compactEstimateB" style="display: none;">
+                            <div class="estimate-pill-badge" id="estimateBadgeB">✓ ใช้ผลวิเคราะห์เดิม — ไม่มีการวิเคราะห์คลิปซ้ำ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Alert for Same Video Selection -->
+                <div id="sameVideoAlert" class="alert-banner alert-warning" style="display: none;" role="alert">
+                    ⚠️ วิดีโอ A และ วิดีโอ B ต้องไม่เป็นรายการเดียวกัน กรุณาเลือกวิดีโออื่นเพื่อทำการเปรียบเทียบ
+                </div>
+
+                <!-- Compare Action Button -->
+                <div class="compare-action-wrapper">
+                    <label for="comparisonModelSelect">โมเดลสำหรับการเปรียบเทียบ</label>
+                    <select id="comparisonModelSelect" class="form-select">
+                        <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                        <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
+                        <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                    </select>
+                    <button type="button" id="startCompareBtn" class="btn btn-compare-main" disabled>
+                        <span>✦ เปรียบเทียบวิดีโอ</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <div id="comparisonLoadingState" class="comparison-loading-container" style="display: none;" aria-live="polite">
+                <div class="spinner-large"></div>
+                <h2 id="loadingTitle">กำลังวิเคราะห์ความสัมพันธ์ระหว่างวิดีโอ...</h2>
+                <div class="loading-steps-list">
+                    <div class="step-item active" id="step1">
+                        <span class="step-icon">●</span>
+                        <span class="step-text">เตรียมข้อมูลวิดีโอและ transcript</span>
+                    </div>
+                    <div class="step-item" id="step2">
+                        <span class="step-icon">○</span>
+                        <span class="step-text">วิเคราะห์ประเด็นร่วมและความแตกต่างโดย AI</span>
+                    </div>
+                    <div class="step-item" id="step3">
+                        <span class="step-icon">○</span>
+                        <span class="step-text">ตรวจสอบหลักฐานและคำนวณตำแหน่งเวลา</span>
+                    </div>
+                    <div class="step-item" id="step4">
+                        <span class="step-icon">○</span>
+                        <span class="step-text">สรุปผลการเปรียบเทียบ 8 มิติ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="comparisonErrorState" class="alert-banner alert-danger" style="display: none;" role="alert">
+                <div class="error-content">
+                    <strong id="errorTitle">ไม่สามารถเปรียบเทียบวิดีโอได้ในขณะนี้</strong>
+                    <p id="errorMessage">ข้อมูลวิดีโอที่เลือกยังคงอยู่ กรุณาลองใหม่อีกครั้ง</p>
+                </div>
+                <button type="button" id="retryCompareBtn" class="btn btn-outline" style="margin-left: 1rem;">ลองอีกครั้ง</button>
+            </div>
+
+            <!-- Empty Workspace Initial Placeholder -->
+            <div id="emptyWorkspaceState" class="empty-workspace-card">
+                <h2>เลือกวิดีโอ 2 รายการเพื่อเริ่มการเปรียบเทียบ</h2>
+                <p>กดปุ่ม <strong>"เลือกจากประวัติ"</strong> ในกล่อง Video A และ Video B ด้านบน จากนั้นกด <strong>"เปรียบเทียบวิดีโอ"</strong> เพื่อเริ่มการวิเคราะห์เชิงลึก</p>
+            </div>
+
+            <!-- Result Workspace Container -->
+            <div id="comparisonResultContainer" class="result-workspace" style="display: none;">
+                
+                <!-- Cache Status Notice -->
+                <div id="cacheNoticeBanner" class="cache-notice-badge" style="display: none;">
+                    ใช้ผลเปรียบเทียบที่บันทึกไว้ (0 Gemini Calls)
+                </div>
+
+                <!-- Compact Result Header & Telemetry Row -->
+                <div class="result-header-card">
+                    <div class="result-videos-summary">
+                        <div class="summary-video-item">
+                            <span class="summary-label label-a">VIDEO A</span>
+                            <strong id="summaryTitleA">--</strong>
+                        </div>
+                        <div class="summary-vs">VS</div>
+                        <div class="summary-video-item">
+                            <span class="summary-label label-b">VIDEO B</span>
+                            <strong id="summaryTitleB">--</strong>
+                        </div>
+                    </div>
+                    <div class="telemetry-bar" id="telemetryBar">
+                        <div class="telemetry-pill"><span id="telemTime">0.0s</span></div>
+                        <div class="telemetry-pill"><span id="telemModel">gemini-2.5-flash</span></div>
+                        <div class="telemetry-pill"><span id="telemTokens">0 Tokens</span></div>
+                        <div class="telemetry-pill"><span id="telemCalls">1 Call</span></div>
+                    </div>
+                </div>
+
+                <!-- Sticky Quick Navigation Bar -->
+                <nav class="sticky-section-nav" id="stickySectionNav">
+                    <a href="#overview-section" class="nav-chip active">📊 ภาพรวม</a>
+                    <a href="#topics-differences-section" class="nav-chip">🧠 ประเด็นและความแตกต่าง</a>
+                    <a href="#contentmap-section" class="nav-chip">📊 จังหวะเนื้อหา</a>
+                    <a href="#sentiment-section" class="nav-chip">🎭 น้ำเสียง</a>
+                    <a href="#insight-section" class="nav-chip">🎯 บทสรุป</a>
+                    <a href="#external-section" class="nav-chip nav-chip-external">🌐 ข้อมูลภายนอก</a>
+                </nav>
+
+                <!-- SECTION 1 — COMPARISON OVERVIEW -->
+                <section id="overview-section" class="result-section-card">
+                    <div class="section-card-header">
+                        <h2>📊 1. ภาพรวมการเปรียบเทียบ</h2>
+                        <span class="section-subtitle">COMPARATIVE OVERVIEW</span>
+                    </div>
+                    <div class="overview-grid">
+                        <div class="overview-main-summary card-inner">
+                            <h3>สรุปภาพรวมเชิงเปรียบเทียบ</h3>
+                            <p id="overviewSummaryText">--</p>
+                        </div>
+                        <div class="overview-focus-grid">
+                            <div class="perspective-card perspective-a">
+                                <span class="badge-slot slot-a">VIDEO A FOCUS</span>
+                                <p id="overviewFocusA">--</p>
+                            </div>
+                            <div class="perspective-card perspective-b">
+                                <span class="badge-slot slot-b">VIDEO B FOCUS</span>
+                                <p id="overviewFocusB">--</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;" class="card-inner">
+                        <h4>กลุ่มเป้าหมายเชิงเปรียบเทียบ</h4>
+                        <p id="overviewAudience">--</p>
+                    </div>
+                </section>
+
+                <!-- SECTION 2 — TOPICS & DIFFERENCES ANALYSIS -->
+                <section id="topics-differences-section" class="result-section-card">
+                    <div class="section-card-header">
+                        <h2>🧠 2. วิเคราะห์ประเด็นและความแตกต่าง</h2>
+                        <span class="section-subtitle">TOPICS & DIFFERENCES ANALYSIS</span>
+                    </div>
+                    <div id="topicsDifferencesContainer" class="topics-differences-grid"></div>
+                </section>
+
+                <!-- SECTION 3 — SPEECH DENSITY & CONTENT PACE GRAPH -->
+                <section id="contentmap-section" class="result-section-card">
+                    <div class="section-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h2>📊 3. จังหวะและความหนาแน่นของเนื้อหา</h2>
+                            <span class="section-subtitle">SPEECH DENSITY & CONTENT PACE</span>
+                        </div>
+                        <div class="density-view-toggle" id="densityViewToggle" style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn btn-sm btn-primary" id="btnDensityModeNormalized" data-mode="normalized">
+                                ตำแหน่งในคลิป (0-100%)
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline" id="btnDensityModeRealtime" data-mode="realtime">
+                                เวลาแบบจริง
+                            </button>
+                        </div>
+                    </div>
+                    <p class="section-note" style="margin-bottom: 1rem; color: var(--text-muted, #718096); font-size: 0.85rem;">
+                        แสดงความหนาแน่นของคำพูดต่อช่วงเวลาและเปรียบเทียบจังหวะการเล่าเรื่องระหว่าง Video A และ Video B
+                    </p>
+
+                    <!-- Graph Container -->
+                    <div id="speechDensityGraphWrapper" class="speech-density-wrapper" style="position: relative; width: 100%; overflow-x: auto;">
+                        <div id="speechDensitySvgContainer" class="speech-density-svg-container"></div>
+
+                        <!-- Detail Popover Modal on Node Click -->
+                        <div id="densityPointDetailPanel" class="density-detail-panel" style="display: none; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <h4 id="densityDetailTitle" style="margin: 0; font-size: 1rem;">รายละเอียดช่วงคำพูด</h4>
+                                <button type="button" id="btnCloseDensityDetail" class="btn-close-sm" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                            </div>
+                            <div id="densityDetailContent" style="font-size: 0.88rem; line-height: 1.5; max-height: 220px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards Grid -->
+                    <div id="densitySummaryGrid" class="density-summary-grid"></div>
+                </section>
+
+                <!-- SECTION 4 — SENTIMENT / TONE -->
+                <section id="sentiment-section" class="result-section-card">
+                    <div class="section-card-header">
+                        <h2>🎭 4. บรรยากาศและน้ำเสียง</h2>
+                        <span class="section-subtitle">SENTIMENT & TONE COMPARISON</span>
+                    </div>
+                    <div class="sentiment-grid">
+                        <div class="sentiment-side-card side-a">
+                            <h4>Video A Tone</h4>
+                            <p id="sentimentTextA">--</p>
+                        </div>
+                        <div class="sentiment-side-card side-b">
+                            <h4>Video B Tone</h4>
+                            <p id="sentimentTextB">--</p>
+                        </div>
+                    </div>
+                    <div class="sentiment-synthesis-card card-inner">
+                        <h4>บทสรุปการเปรียบเทียบน้าเสียง (Synthesis)</h4>
+                        <p id="sentimentSynthesis">--</p>
+                    </div>
+                </section>
+
+                <!-- SECTION 5 — FINAL COMPARATIVE INSIGHT -->
+                <section id="insight-section" class="result-section-card">
+                    <div class="section-card-header">
+                        <h2>🎯 5. บทสรุปเชิงเปรียบเทียบ</h2>
+                        <span class="section-subtitle">FINAL COMPARATIVE INSIGHT</span>
+                    </div>
+                    <div class="insight-cards-grid">
+                        <div class="insight-card hero-takeaway">
+                            <h3>Core Takeaway</h3>
+                            <p id="insightCore">--</p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>ข้อสรุปเปรียบเทียบ</h3>
+                            <p id="insightConclusion">--</p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>คำแนะนำสำหรับการใช้งาน (Recommendation)</h3>
+                            <p id="insightRecommendation">--</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EXTERNAL RESEARCH SECTION -->
+                <section id="external-section" class="result-section-card external-poc-section">
+                    <div class="section-card-header external-card-header">
+                        <div class="header-left">
+                            <h2>🌐 ข้อมูลและกระแสจากภายนอก</h2>
+                            <span class="section-subtitle">EXTERNAL INSIGHTS & TRENDS</span>
+                        </div>
+                        <div class="header-right">
+                            <span id="externalSearchTimestamp" class="ext-timestamp-tag">ข้อมูลภายนอก ณ วันที่ --</span>
+                            <button type="button" id="btnRefreshExternalResearch" class="btn btn-outline btn-sm">อัปเดตข้อมูลล่าสุด</button>
+                        </div>
+                    </div>
+
+                    <!-- Mandatory Disclaimer Banner -->
+                    <div class="external-disclaimer-banner" role="alert">
+                        ⚠️ <strong>ข้อสังเกต:</strong> ข้อมูลส่วนนี้มาจากแหล่งข้อมูลภายนอก ไม่ใช่คำพูดหรือข้อสรุปโดยตรงจากวิดีโอ
+                    </div>
+
+                    <div id="externalTopicsContainer" class="external-topics-grid" style="margin-top: 1rem;"></div>
+
+                    <!-- External Telemetry Display -->
+                    <div class="external-telemetry-container" id="externalTelemetryBar" style="margin-top: 1.5rem; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(0,0,0,0.03); font-size: 0.8rem;">
+                        <span id="extTelemQueries">Queries: 0</span> • 
+                        <span id="extTelemSources">Sources: 0</span> • 
+                        <span id="extTelemCalls">Gemini Calls: 0</span> • 
+                        <span id="extTelemTokens">Tokens: 0</span> • 
+                        <span id="extTelemTime">Time: 0.0s</span>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Candidate Selection Modal -->
+    <div id="candidateModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="candidateModalTitle" style="display: none;">
+        <div class="modal-card modal-card-large">
+            <div class="modal-header">
+                <h2 id="candidateModalTitle">เลือกวิดีโอจากประวัติ</h2>
+                <button type="button" class="btn-close-modal" id="btnCloseCandidateModal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-filter-bar">
+                    <div class="search-box">
+                        <input type="text" id="candidateSearchInput" placeholder="ค้นหาวิดีโอ..." aria-label="Search candidates">
+                    </div>
+                    <div class="filter-tabs" id="candidateFilterTabs">
+                        <button type="button" class="tab-btn active" data-type="">ทั้งหมด</button>
+                        <button type="button" class="tab-btn" data-type="youtube">YouTube</button>
+                        <button type="button" class="tab-btn" data-type="tiktok">TikTok</button>
+                        <button type="button" class="tab-btn" data-type="mp4">MP4</button>
+                    </div>
+                </div>
+
+                <div id="candidateLoading" class="modal-state" style="display: none;">
+                    <div class="spinner-large"></div>
+                    <p>กำลังโหลดรายการวิดีโอ...</p>
+                </div>
+
+                <div id="candidateEmpty" class="modal-state" style="display: none;">
+                    <p>ไม่พบรายการวิดีโอที่พร้อมเปรียบเทียบ</p>
+                </div>
+
+                <div id="candidateListGrid" class="candidate-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelCandidateModal">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evidence Detail Viewer Modal -->
+    <div id="evidenceModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="evidenceModalTitle" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="evidenceModalTitle">ตรวจสอบหลักฐานจากคลิป</h2>
+                <button type="button" class="btn-close-modal" id="btnCloseEvidenceModal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="evidence-meta-card">
+                    <div class="ev-video-info">
+                        <span class="video-tag" id="evVideoTag">VIDEO A</span>
+                        <h3 id="evVideoTitle">--</h3>
+                    </div>
+                    <div class="ev-badges-row">
+                        <span class="ev-timestamp-badge" id="evTimeBadge">00:00</span>
+                        <span class="status-badge" id="evStatusBadge">✓ Verified</span>
+                    </div>
+                </div>
+
+                <div class="authoritative-transcript-box">
+                    <label>ข้อความจากคลิป (Authoritative Transcript):</label>
+                    <div class="transcript-content" id="evTranscriptText">--</div>
+                </div>
+
+                <!-- Media Player if retained -->
+                <div id="evMediaPlayerWrapper" class="media-player-container" style="display: none;">
+                    <video id="evVideoPlayer" controls style="width: 100%; max-height: 240px; border-radius: 8px;"></video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCloseEvidenceModalFooter">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Sources Detail Modal -->
+    <div id="externalSourcesModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="externalSourcesModalTitle" style="display: none;">
+        <div class="modal-card modal-card-large">
+            <div class="modal-header">
+                <h2 id="externalSourcesModalTitle">🌐 แหล่งข้อมูลอ้างอิงภายนอก (External Sources)</h2>
+                <button type="button" class="btn-close-modal" id="btnCloseExternalSourcesModal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="externalSourcesList" class="external-sources-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCloseExternalSourcesModalFooter">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</body>
+</html>

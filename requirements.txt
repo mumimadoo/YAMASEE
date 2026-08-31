@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-dotenv
+python-multipart
+google-genai
+reportlab
+faster-whisper==1.2.1
+sqlalchemy>=2.0
+alembic>=1.13
+passlib[bcrypt]>=1.7
+bcrypt
+itsdangerous>=2.2
+email-validator>=2.1
+psycopg[binary]==3.3.4

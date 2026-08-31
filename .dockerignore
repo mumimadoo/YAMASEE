@@ -1,0 +1,52 @@
+# Exclude local environment files
+.env
+.env.local
+.env.*.local
+
+# Exclude git repository
+.git
+.gitignore
+
+# Exclude python cache and test folders
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.pytest_cache
+.cache/
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Exclude runtime data, backups, and logs
+data/
+analysis_history/
+logs/
+backups/
+scratch/
+
+# Exclude Windows-specific large executables (to avoid bloating build context)
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+yt-dlp.exe
+
+# Exclude node modules and other frontend stuff
+node_modules/
+edge-profile/
+package-lock.json
+
+# Exclude IDE/Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,64 @@
+MODULE 8 - Knowledge Organization Engine
+Version 1.0
+
+1. Vision
+Module 8 เปลี่ยน Transcript ให้เป็นโครงสร้างองค์ความรู้ (Knowledge Tree)
+เพื่อให้ผู้ใช้ค้นหา นำทาง และกลับไปยังช่วงเวลาของวิดีโอได้
+
+2. หน้าที่
+- Knowledge Extraction
+- Knowledge Classification
+- Knowledge Linking
+- Knowledge Organization
+- Knowledge Validation
+
+3. Input
+รับเฉพาะ Transcript Timeline (start,end,text)
+ไม่เกี่ยวกับ Whisper, Audio, Video หรือ FFmpeg
+
+4. Pipeline
+Transcript
+ -> Knowledge Extraction
+ -> Knowledge Classification
+ -> Knowledge Linking
+ -> Knowledge Organization
+ -> Knowledge Validation
+ -> Knowledge Tree
+ -> Frontend
+
+5. Knowledge Model
+Main Topic
+  -> Sub Topic
+      -> Occurrence
+          - Start
+          - End
+          - Description
+
+6. Design Principles
+- จำความรู้ ไม่ใช่จำประโยค
+- หัวข้อเดิมที่ถูกกล่าวหลายครั้ง ให้เพิ่ม Occurrence ไม่สร้าง Topic ใหม่
+- Backend สร้าง Tree ทั้งหมด
+- Frontend Render อย่างเดียว
+- AI มีหน้าที่เสนอข้อมูล Backend เป็นผู้ตัดสินผลลัพธ์สุดท้าย
+
+7. Validation
+- Main Topic ต้องถูกต้อง
+- Sub Topic ต้องมี Parent
+- Occurrence ต้องมี Start/End
+- Start < End
+- Description ต้องไม่ว่าง
+- ไม่มีโครงสร้างผิดรูป
+
+8. Output
+Knowledge Tree พร้อมใช้งานสำหรับ Frontend
+
+9. Version 1
+รองรับ Main Topic, Sub Topic, Occurrence, Tree Builder, Validation
+
+10. Version 2
+Knowledge Search
+Related Knowledge
+Knowledge Graph
+Confidence Score
+Knowledge Statistics
+Semantic Merge

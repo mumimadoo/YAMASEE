@@ -1,0 +1,104 @@
+ตรวจและแก้โปรเจกต์นี้แบบ minimal patch เท่านั้น ห้าม redesign UI ห้ามเปลี่ยน schema response และห้ามแก้ไฟล์ที่ไม่เกี่ยวข้อง
+
+เป้าหมายรอบนี้คือกู้ระบบที่เคยทำงานให้กลับมาเสถียรก่อน โดยแก้ตามลำดับต่อไปนี้
+
+P0-1: แก้ static/app.js
+
+ฟังก์ชัน renderTranscriptComponent ถูกเปลี่ยนเป็น incremental rendering ครั้งละ 50 รายการ ซึ่งทำให้ transcript แสดงไม่ครบ และ trackLiveSubtitle หา element tx-row-index ไม่เจอเมื่อแถวนั้นยังไม่ถูก render
+
+ให้ลบระบบ renderedCount, BATCH_SIZE, appendBatch และ onscroll ออก
+
+ให้ renderTranscriptComponent เรนเดอร์ items ทั้งหมดในครั้งเดียวเหมือนเวอร์ชันเดิม โดย:
+
+* ทุกแถวต้องมี id="tx-row-${index}"
+* รองรับ keyword highlight เหมือนเดิม
+* ห้ามตัดจำนวนรายการ
+* ห้ามเปลี่ยน globalTimelineData
+* escape keyword ก่อนสร้าง RegExp เพื่อป้องกัน regex error
+* คง findActiveIndex และ trackLiveSubtitle เวอร์ชันปัจจุบันไว้ได้
+
+P0-2: แก้ engines/transcript_engine.py
+
+ปัจจุบัน validate_timeline_integrity คืน integrity_percent = 100.0 ตลอด ซึ่งผิด
+
+ให้คำนวณจาก ID จริง:
+
+* expected_ids = ID ทั้งหมดใน whisper_map
+* returned_ids = ID ที่มี transcript และ text ไม่ว่าง
+* missing_ids = expected_ids - returned_ids
+* integrity_percent = len(returned_ids) / len(expected_ids) * 100
+* คืน failed_chunk_indexes หรือ missing_segment_ids ให้ main.py ใช้งานได้
+* total_segments ต้องเป็นจำนวน segment ที่ได้จริง
+* ถ้า whisper_map ว่าง ให้ integrity เป็น 0 ไม่ใช่ 100
+
+P0-3: ป้องกัน transcript หายเงียบ
+
+ใน _gemini_transcribed_timeline:
+
+* สร้าง dictionary ของผล Gemini ด้วย id
+* วนตาม original segments ใน whisper_map ตามลำดับ ไม่ใช่วนตามผลที่ Gemini ส่งกลับ
+* ถ้า ID ใดไม่มีข้อความ ให้ใส่ text เป็นค่าว่างและบันทึก missing ID
+* ห้ามทำให้ลำดับ timeline สลับ
+* sort timeline ตาม start ก่อน return
+* ต้องรักษา start และ end จาก Whisper เท่านั้น
+
+P0-4: ส่งข้อมูล VAD ให้ Gemini ครบ
+
+ใน _gemini_chunk_transcribe เปลี่ยน vad_info จากการส่งแค่ id เป็น:
+{"id": ..., "relative_start": segment_start - chunk_start, "relative_end": segment_end - chunk_start}
+
+อธิบายใน prompt ให้ Gemini ถอดข้อความตามขอบเขตเวลาของแต่ละ VAD ID และต้องคืนทุก ID เพียงครั้งเดียว
+
+ห้ามให้ Gemini สร้าง timestamp ใหม่
+
+P0-5: แก้การตัด chunk
+
+ปัจจุบัน chunk_duration ใช้ผลรวมเฉพาะช่วงพูด ซึ่งอาจทำให้ช่วงเสียงจริงยาวเกิน 5 นาที
+
+ให้แบ่ง chunk โดยใช้:
+current_chunk_end - current_chunk_start
+
+กำหนดช่วงเป้าหมายประมาณ 300 วินาที และห้าม chunk เกิน 360 วินาทีถ้าเป็นไปได้
+
+P0-6: ปรับ Whisper ให้ตรงกับวัตถุประสงค์
+
+Whisper ใช้หา timestamp/VAD เท่านั้น:
+
+* ใช้ tiny ก่อน และ base เป็น fallback
+* word_timestamps=False
+* beam_size=1
+* best_of=1
+* temperature=0
+* condition_on_previous_text=False
+* vad_filter=True
+
+ให้บันทึกชื่อโมเดลที่โหลดสำเร็จจริงลง self.whisper_model_name ห้ามรายงานชื่อจาก environment ที่ไม่ได้ถูกโหลดจริง
+
+P0-7: เพิ่ม error logging โดยไม่เปลี่ยน flow
+
+ใน AIAnalysisEngine.generate_analytics:
+
+* log model_name, attempt และ exception
+* หาก response.text parse JSON ไม่ได้ ให้ log ข้อผิดพลาดและลองใหม่
+* ห้ามกลืน exception แบบเงียบ
+* ยังคง fallback model pool เดิมไว้ก่อน ห้ามเปลี่ยนชื่อโมเดลในรอบนี้
+
+ข้อห้าม:
+
+* ห้ามแก้ CSS/HTML
+* ห้ามเปลี่ยน endpoint
+* ห้ามเปลี่ยน JSON schema ที่ frontend ใช้อยู่
+* ห้ามเพิ่ม dependency
+* ห้ามสร้างระบบใหม่
+* ห้ามลบ cache/history
+* ห้ามแก้ระบบดาวน์โหลดวิดีโอหรือ PDF
+* ห้ามเปลี่ยน prompt วิเคราะห์ 8/9 โมดูล
+* ยังไม่ต้องทำ single-upload Gemini architecture ในรอบนี้ เพราะเป็น refactor ใหญ่
+
+หลังแก้:
+
+1. รัน python -m py_compile กับไฟล์ Python ที่แก้
+2. รัน node --check กับ app.js
+3. แสดง diff เฉพาะไฟล์ที่แก้
+4. สรุปสาเหตุและสิ่งที่แก้ไม่เกิน 15 บรรทัด
+5. อย่าแก้ส่วนอื่นนอกเหนือรายการนี้

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="day">
+<head>
+    {% include "partials/auth_theme_script.html" %}
+    {% include "partials/auth_head.html" %}
+    <title>ประวัติการเปรียบเทียบ - YAMASEE Media Intelligence</title>
+    <link rel="stylesheet" href="/static/css/auth-shared.css?v=1.3.0">
+    <link rel="stylesheet" href="/static/css/comparison.css?v=1.5.1">
+    <link rel="stylesheet" href="/static/css/night-glass-ui.css?v=1.0.0">
+    <script src="/static/js/comparison_history.js?v=1.2.2" defer></script>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <a href="/landing" class="brand-logo">
+            <img src="/static/Logo_boy.png" alt="YAMASEE Logo">
+            <span>YAMASEE</span>
+        </a>
+        <div class="nav-actions">
+            {% include "partials/user_popover.html" %}
+            <a href="/landing" class="btn btn-outline"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/dashboard" class="btn btn-outline"><span class="nav-text-effect" data-text="Dashboard"><span class="nav-text-base">Dashboard</span><span class="nav-text-hover" aria-hidden="true">Dashboard</span></span></a>
+            <a href="/comparison" class="btn btn-outline"><span class="nav-text-effect" data-text="Compare"><span class="nav-text-base">Compare</span><span class="nav-text-hover" aria-hidden="true">Compare</span></span></a>
+            <a href="/comparison/history" class="btn btn-outline active"><span class="nav-text-effect" data-text="Comparison History"><span class="nav-text-base">Comparison History</span><span class="nav-text-hover" aria-hidden="true">Comparison History</span></span></a>
+            {% if user and (user.role in ['admin', 'owner'] or user.is_admin) %}
+            <a href="/admin" class="btn btn-outline"><span class="nav-text-effect" data-text="Admin"><span class="nav-text-base">Admin</span><span class="nav-text-hover" aria-hidden="true">Admin</span></span></a>
+            {% endif %}
+            <button type="button" id="logoutBtn" class="btn btn-outline btn-logout"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% include "partials/theme_switch.html" %}
+        </div>
+    </header>
+
+    <main class="comparison-page-wrapper">
+        <div class="comparison-container">
+
+            <div class="comparison-hero">
+                <div class="hero-badge">
+                    <span> COMPARISON HISTORY WORKSPACE </span>
+                </div>
+                <h1 class="hero-title">ประวัติการเปรียบเทียบวิดีโอ</h1>
+                <p class="hero-subtitle">รายการเปรียบเทียบทั้งหมดที่คุณเคยดำเนินการ กด "ดูผลอีกครั้ง" เพื่อเรียกดูผลวิเคราะห์เดิมโดยไม่เสีย Token ใหม่</p>
+            </div>
+
+            <!-- History List Container -->
+            <div id="historyLoading" class="comparison-loading-container" style="display: block;">
+                <div class="spinner-large"></div>
+                <h2>กำลังโหลดประวัติการเปรียบเทียบ...</h2>
+            </div>
+
+            <div id="historyEmpty" class="empty-workspace-card" style="display: none;">
+                <h2>📂 ยังไม่มีประวัติการเปรียบเทียบ</h2>
+                <p>คุณยังไม่ได้เปรียบเทียบวิดีโอใดๆ กดปุ่ม <strong>"ไปที่หน้าเปรียบเทียบ"</strong> ด้านล่างเพื่อเริ่มเปรียบเทียบครั้งแรก</p>
+                <div style="margin-top: 1rem;">
+                    <a href="/comparison" class="btn btn-compare-main" style="display: inline-flex; text-decoration: none;">⚔️ ไปที่หน้าเปรียบเทียบ</a>
+                </div>
+            </div>
+
+            <div id="historyGrid" class="comp-history-grid" style="display: none;"></div>
+
+            <!-- Pagination Bar -->
+            <div id="paginationContainer" class="pagination-bar" style="display: none; justify-content: center; margin-top: 2rem; gap: 0.5rem;">
+                <button type="button" id="btnPrevPage" class="btn btn-outline" disabled>« หน้าก่อนหน้า</button>
+                <span id="pageIndicator" class="page-indicator" style="align-self: center; font-weight: 600;">หน้า 1 / 1</span>
+                <button type="button" id="btnNextPage" class="btn btn-outline" disabled>หน้าถัดไป »</button>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

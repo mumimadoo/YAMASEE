@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="day">
+<head>
+    {% include "partials/auth_theme_script.html" %}
+    {% include "partials/auth_head.html" %}
+    <link rel="stylesheet" href="/static/css/auth-shared.css?v=1.3.0">
+    <link rel="stylesheet" href="/static/css/history.css?v=1.1.1">
+    <script src="/static/js/history.js?v=1.1.5" defer></script>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <header class="site-header">
+        <a href="/landing" class="brand-logo">
+            <img src="/static/Logo_boy.png" alt="YAMASEE Logo">
+            <span>YAMASEE</span>
+        </a>
+        <div class="nav-actions">
+            {% include "partials/user_popover.html" %}
+            <a href="/landing" class="btn btn-outline"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/dashboard" class="btn btn-outline"><span class="nav-text-effect" data-text="Dashboard"><span class="nav-text-base">Dashboard</span><span class="nav-text-hover" aria-hidden="true">Dashboard</span></span></a>
+            <a href="/history" class="btn btn-outline active"><span class="nav-text-effect" data-text="History"><span class="nav-text-base">History</span><span class="nav-text-hover" aria-hidden="true">History</span></span></a>
+            <a href="/comparison" class="btn btn-outline"><span class="nav-text-effect" data-text="Compare"><span class="nav-text-base">Compare</span><span class="nav-text-hover" aria-hidden="true">Compare</span></span></a>
+            {% if user and (user.role in ['admin', 'owner'] or user.is_admin) %}
+            <a href="/admin" class="btn btn-outline"><span class="nav-text-effect" data-text="Admin"><span class="nav-text-base">Admin</span><span class="nav-text-hover" aria-hidden="true">Admin</span></span></a>
+            {% endif %}
+            <button type="button" id="logoutBtn" class="btn btn-outline btn-logout"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% include "partials/theme_switch.html" %}
+        </div>
+    </header>
+
+    <main class="history-page-wrapper">
+        <div class="history-container">
+            <div class="history-controls-bar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="ค้นหาตามชื่อ หรือ URL..." aria-label="Search History">
+                </div>
+                <div class="filter-group">
+                    <select id="statusFilter" aria-label="Filter by status">
+                        <option value="">ทุกสถานะ</option>
+                        <option value="completed">เสร็จสิ้น</option>
+                        <option value="processing">กำลังประมวลผล</option>
+                        <option value="queued">รอดำเนินการ</option>
+                        <option value="failed">ล้มเหลว</option>
+                    </select>
+                    <select id="sourceTypeFilter" aria-label="Filter by source type">
+                        <option value="">ทุกประเภทสื่อ</option>
+                        <option value="youtube">YouTube URL</option>
+                        <option value="tiktok">TikTok URL</option>
+                        <option value="upload">ไฟล์อัปโหลด</option>
+                    </select>
+                    <select id="sortSelect" aria-label="Sort history">
+                        <option value="newest">ใหม่ล่าสุด</option>
+                        <option value="oldest">เก่าที่สุด</option>
+                        <option value="title_asc">ชื่อ A-Z</option>
+                        <option value="title_desc">ชื่อ Z-A</option>
+                    </select>
+                    <label class="pinned-toggle">
+                        <input type="checkbox" id="pinnedOnlyToggle">
+                        <span>📌 เฉพาะรายการปักหมุด</span>
+                    </label>
+                    <button type="button" id="resetFiltersBtn" class="btn btn-outline" style="margin-left: 0.5rem; height: 38px; padding: 0 0.75rem; font-size: 0.85rem;">ล้างตัวกรอง</button>
+                </div>
+            </div>
+
+            <div id="statusAlert" class="alert-banner" role="alert" aria-live="polite" style="display: none;"></div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="state-container" aria-live="polite">
+                <div class="spinner-large"></div>
+                <p>กำลังโหลดประวัติการวิเคราะห์...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="state-container" style="display: none;" aria-live="polite">
+                <div class="state-icon">⚠️</div>
+                <h2 id="errorTitle">เกิดข้อผิดพลาดในการโหลดข้อมูล</h2>
+                <p id="errorMessage">ไม่สามารถดึงข้อมูลประวัติได้ กรุณาลองใหม่อีกครั้ง</p>
+                <button type="button" id="retryBtn" class="btn btn-primary">ลองใหม่</button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="state-container" style="display: none;" aria-live="polite">
+                <div class="state-icon">📁</div>
+                <h2>ยังไม่มีประวัติการวิเคราะห์</h2>
+                <p>เริ่มต้นประมวลผลสื่อ YouTube หรือไฟล์เสียง/วิดีโอแรกของคุณได้ที่หน้าแดชบอร์ด</p>
+                <a href="/dashboard" class="btn btn-primary">ไปที่แดชบอร์ด</a>
+            </div>
+
+            <!-- History List Grid -->
+            <div id="historyGrid" class="history-grid" style="display: none;"></div>
+
+            <!-- Pagination Controls -->
+            <nav id="paginationNav" class="pagination-nav" aria-label="Pagination" style="display: none;">
+                <button type="button" id="prevPageBtn" class="btn btn-pagination" disabled aria-label="Previous Page">&laquo; ก่อนหน้า</button>
+                <span id="pageInfo" class="page-info">หน้า 1 จาก 1</span>
+                <button type="button" id="nextPageBtn" class="btn btn-pagination" disabled aria-label="Next Page">ถัดไป &raquo;</button>
+            </nav>
+        </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="modalTitle">รายละเอียดการวิเคราะห์</h2>
+                <button type="button" id="closeModalBtn" class="btn-close-modal" aria-label="Close modal">&times;</button>
+            </div>
+            <div id="modalLoading" class="modal-loading">
+                <div class="spinner-large"></div>
+                <p>กำลังโหลดรายละเอียด...</p>
+            </div>
+            <div id="modalBody" class="modal-body" style="display: none;"></div>
+            <div class="modal-footer">
+                <a id="downloadTxtBtn" href="#" class="btn btn-outline" target="_blank" style="display: none;">ดาวน์โหลด TXT</a>
+                <a id="downloadPdfBtn" href="#" class="btn btn-outline" target="_blank" style="display: none;">ดาวน์โหลด PDF</a>
+                <button type="button" id="modalCloseBtn" class="btn btn-secondary">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" style="display: none;">
+        <div class="modal-card modal-card-small">
+            <div class="modal-header">
+                <h2 id="deleteModalTitle">ยืนยันการลบรายการ</h2>
+                <button type="button" id="closeDeleteModalBtn" class="btn-close-modal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>คุณแน่ใจหรือไม่ว่าต้องการลบรายการประวัติการวิเคราะห์นี้?</p>
+                <p class="delete-warning-text">การลบนี้จะลบเฉพาะรายการในประวัติของคุณ และไม่สามารถย้อนกลับได้</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">ยกเลิก</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">ลบรายการ</button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="day">
+<head>
+    {% include "partials/auth_theme_script.html" %}
+    {% include "partials/auth_head.html" %}
+    <link rel="stylesheet" href="/static/css/auth-forms.css?v=1.1.1">
+    <script src="/static/js/register.js?v=1.1.1" defer></script>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <header class="site-header">
+        <a href="/landing" class="brand-logo">
+            <img src="/static/Logo_boy.png" alt="YAMASEE Logo">
+            <span>YAMASEE</span>
+        </a>
+        <div class="nav-actions">
+            <a href="/landing" class="btn btn-outline"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/login" class="btn btn-outline"><span class="nav-text-effect" data-text="Login"><span class="nav-text-base">Login</span><span class="nav-text-hover" aria-hidden="true">Login</span></span></a>
+            <a href="/register" class="btn btn-outline active"><span class="nav-text-effect" data-text="Sign Up"><span class="nav-text-base">Sign Up</span><span class="nav-text-hover" aria-hidden="true">Sign Up</span></span></a>
+            <button type="button" id="logoutBtn" class="btn btn-outline btn-logout"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% include "partials/theme_switch.html" %}
+        </div>
+    </header>
+
+    <main class="auth-page-wrapper">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h1>สมัครสมาชิก</h1>
+                <p>ลงทะเบียนเพื่อเริ่มจัดเก็บและติดตามประวัติการวิเคราะห์สื่อ</p>
+            </div>
+
+            <div id="alertBanner" class="alert-banner" role="alert" aria-live="polite"></div>
+
+            <form id="registerForm" novalidate>
+                <div class="form-group">
+                    <label for="username" class="form-label">ชื่อผู้ใช้งาน (Username)</label>
+                    <input type="text" id="username" name="username" class="form-input" placeholder="Narakorn" autocomplete="username" required minlength="2" maxlength="80">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">อีเมลผู้ใช้งาน</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="name@example.com" autocomplete="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">รหัสผ่าน (อย่างน้อย 8 ตัวอักษร มีตัวอักษรและตัวเลข)</label>
+                    <div class="input-password-wrapper">
+                        <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" autocomplete="new-password" required minlength="8" maxlength="128">
+                        <button type="button" id="togglePassword" class="btn-toggle-password" aria-label="Show or hide password">Show</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">ยืนยันรหัสผ่าน</label>
+                    <div class="input-password-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="••••••••" autocomplete="new-password" required minlength="8" maxlength="128">
+                        <button type="button" id="toggleConfirmPassword" class="btn-toggle-password" aria-label="Show or hide confirm password">Show</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary btn-submit">
+                    <span id="submitSpinner" class="spinner" style="display: none;"></span>
+                    <span id="submitBtnText">สร้างบัญชีผู้ใช้</span>
+                </button>
+            </form>
+
+            <div class="auth-card-footer">
+                มีบัญชีผู้ใช้งานอยู่แล้ว? <a href="/login">เข้าสู่ระบบที่นี่</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

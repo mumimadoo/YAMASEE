@@ -1,0 +1,172 @@
+/* YAMASEE shared day-only organic sunlight atmosphere. */
+.yamasee-day-sunlight {
+  display: none;
+}
+
+html[data-theme="day"],
+html:not([data-theme="night"]) {
+  background: #FFFDF8;
+}
+
+html[data-theme="day"] body,
+html:not([data-theme="night"]) body {
+  background: transparent !important;
+}
+
+html[data-theme="day"] .bg-mesh,
+html:not([data-theme="night"]) .bg-mesh {
+  opacity: 0 !important;
+}
+
+html[data-theme="day"] .yamasee-day-sunlight,
+html:not([data-theme="night"]) .yamasee-day-sunlight {
+  display: block;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  min-height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 78% 20% at 52% 2%, rgba(255,255,255,.98), rgba(254,240,138,.58) 34%, rgba(250,204,21,.23) 57%, transparent 76%),
+    radial-gradient(ellipse 58% 18% at 88% 20%, rgba(251,146,60,.28), transparent 72%),
+    radial-gradient(ellipse 62% 20% at 13% 48%, rgba(253,224,71,.25), transparent 74%),
+    radial-gradient(ellipse 55% 18% at 78% 72%, rgba(251,113,133,.16), transparent 74%),
+    radial-gradient(ellipse 68% 18% at 42% 94%, rgba(251,146,60,.22), transparent 75%),
+    linear-gradient(135deg, #FFFDF8 0%, #FFF9EE 48%, #FFF4E6 100%);
+}
+
+.yamasee-sunlight-source {
+  position: absolute;
+  width: min(86vw, 1500px);
+  height: min(42vw, 720px);
+  left: 50%;
+  top: -10%;
+  transform: translateX(-50%);
+  border-radius: 45% 55% 60% 40% / 58% 44% 56% 42%;
+  opacity: .78;
+  background: radial-gradient(ellipse at 50% 42%, #FFFFFF 0%, rgba(255,253,248,.96) 24%, rgba(254,240,138,.64) 48%, rgba(250,204,21,.20) 68%, transparent 82%);
+  filter: blur(18px);
+}
+
+.yamasee-organic-surface {
+  position: absolute;
+  width: 100%;
+  height: 24%;
+  overflow: visible;
+  will-change: transform;
+}
+
+.yamasee-organic-surface path {
+  vector-effect: non-scaling-stroke;
+}
+
+.yamasee-organic-a {
+  top: 8%;
+  left: -8%;
+  width: 116%;
+  transform: translate3d(var(--day-pointer-a-x, 0px), var(--day-pointer-a-y, 0px), 0) rotate(-2deg);
+  animation: yamaseeDaySurfaceA 27s ease-in-out infinite alternate;
+}
+
+.yamasee-organic-b {
+  top: 35%;
+  right: -10%;
+  width: 120%;
+  transform: translate3d(var(--day-pointer-b-x, 0px), var(--day-pointer-b-y, 0px), 0) rotate(3deg);
+  animation: yamaseeDaySurfaceB 33s ease-in-out infinite alternate;
+}
+
+.yamasee-organic-c {
+  top: 64%;
+  left: -7%;
+  width: 114%;
+  transform: rotate(-3deg);
+  animation: yamaseeDaySurfaceC 30s ease-in-out infinite alternate;
+}
+
+.yamasee-organic-d {
+  top: 84%;
+  right: -12%;
+  width: 118%;
+  height: 20%;
+  transform: rotate(2deg);
+  animation: yamaseeDaySurfaceD 35s ease-in-out infinite alternate;
+}
+
+.yamasee-day-bloom {
+  position: absolute;
+  border-radius: 48% 52% 37% 63% / 56% 39% 61% 44%;
+  filter: blur(54px);
+  opacity: .30;
+}
+
+.yamasee-day-bloom-a {
+  width: 52vw;
+  height: 18%;
+  right: -8vw;
+  top: 24%;
+  background: linear-gradient(118deg, rgba(255,255,255,.72), rgba(253,224,71,.55), rgba(251,146,60,.35));
+}
+
+.yamasee-day-bloom-b {
+  width: 46vw;
+  height: 16%;
+  left: -8vw;
+  top: 55%;
+  opacity: .22;
+  background: linear-gradient(106deg, rgba(255,255,255,.75), rgba(253,186,116,.44), rgba(251,113,133,.26));
+}
+
+.yamasee-day-bloom-c {
+  width: 58vw;
+  height: 14%;
+  right: 8vw;
+  bottom: -2%;
+  opacity: .26;
+  background: linear-gradient(100deg, rgba(255,255,255,.82), rgba(254,240,138,.55), rgba(249,115,22,.24));
+}
+
+.yamasee-day-texture {
+  position: absolute;
+  inset: 0;
+  opacity: .16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.09'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+@keyframes yamaseeDaySurfaceA {
+  from { margin-left: -1.5%; margin-top: -1%; scale: .985 .94; }
+  to { margin-left: 2%; margin-top: 1.4%; scale: 1.025 1.06; }
+}
+
+@keyframes yamaseeDaySurfaceB {
+  from { margin-right: -1%; margin-top: 1%; scale: 1.02 .95; }
+  to { margin-right: 2%; margin-top: -1.5%; scale: .98 1.07; }
+}
+
+@keyframes yamaseeDaySurfaceC {
+  from { margin-left: -2%; scale: .98 1.03; }
+  to { margin-left: 2%; scale: 1.03 .96; }
+}
+
+@keyframes yamaseeDaySurfaceD {
+  from { margin-right: -1%; scale: 1 .94; }
+  to { margin-right: 2%; scale: 1.03 1.05; }
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .yamasee-organic-a,
+  .yamasee-organic-b {
+    --day-pointer-a-x: 0px !important;
+    --day-pointer-a-y: 0px !important;
+    --day-pointer-b-x: 0px !important;
+    --day-pointer-b-y: 0px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yamasee-organic-surface {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,462 @@
+/* --- YAMASEE SHARED AUTH & SYSTEM THEME DESIGN SYSTEM --- */
+
+:root, html[data-theme="day"] {
+  --bg-primary: #FFF8EC;
+  --bg-secondary: #FFF1D6;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --text-primary: #2B2118;
+  --text-secondary: #725E4A;
+  --border: rgba(172, 111, 32, 0.18);
+  --primary: #F59E0B;
+  --primary-hover: #D97706;
+  --secondary: #FB923C;
+  --accent: #FACC15;
+  --success: #16A34A;
+  --danger: #DC2626;
+  --focus-ring: rgba(245, 158, 11, 0.35);
+  --shadow-glow: rgba(245, 158, 11, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(245, 158, 11, 0.2);
+}
+
+html[data-theme="night"] {
+  --bg-primary: #07111F;
+  --bg-secondary: #101A33;
+  --surface: rgba(15, 27, 50, 0.72);
+  --surface-strong: rgba(17, 31, 57, 0.92);
+  --text-primary: #F3F8FF;
+  --text-secondary: #A9BAD2;
+  --border: rgba(112, 199, 255, 0.18);
+  --primary: #22D3EE;
+  --primary-hover: #06B6D4;
+  --secondary: #8B5CF6;
+  --accent: #38BDF8;
+  --success: #22C55E;
+  --danger: #F87171;
+  --focus-ring: rgba(34, 211, 238, 0.32);
+  --shadow-glow: rgba(34, 211, 238, 0.15);
+  --glass-bg: rgba(15, 27, 50, 0.65);
+  --glass-border: rgba(34, 211, 238, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Background Mesh Gradients */
+.bg-mesh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 20%, var(--bg-secondary) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, var(--shadow-glow) 0%, transparent 50%);
+}
+
+/* Header Navbar */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 1.35rem;
+}
+
+.brand-logo img {
+  height: 38px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Username Identity Chip & User Info Popover */
+.user-chip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  outline: none;
+}
+
+.user-chip:hover,
+.user-chip:focus-visible {
+  background: var(--surface-strong, rgba(0, 0, 0, 0.06));
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.user-chip-icon {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+html[data-theme="night"] .user-chip {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+html[data-theme="night"] .user-chip:hover,
+html[data-theme="night"] .user-chip:focus-visible {
+  background: rgba(124, 58, 237, 0.18);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+html[data-theme="night"] .user-chip-icon {
+  color: rgba(168, 85, 247, 0.80);
+}
+
+html[data-theme="night"] .user-chip-name {
+  color: #C084FC;
+}
+
+/* Day Theme Popover Card */
+.user-popover-card {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  max-width: calc(100vw - 32px);
+  padding: 16px 18px;
+  background: rgba(255, 252, 245, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(180, 130, 60, 0.14), 0 0 15px rgba(245, 158, 11, 0.06);
+  z-index: 1000;
+  text-align: left;
+  animation: popoverFadeIn 0.15s ease-out;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popover-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #291E15;
+}
+
+.popover-user-icon {
+  font-size: 1.05rem;
+  color: #D97706;
+}
+
+.popover-username {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popover-email {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #6E5D4F;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popover-role-wrapper {
+  margin-top: 10px;
+}
+
+.popover-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.role-badge-admin {
+  background: rgba(232, 91, 122, 0.12);
+  color: #D946EF;
+  border: 1px solid rgba(217, 70, 239, 0.3);
+}
+
+.role-badge-owner {
+  background: rgba(249, 115, 22, 0.12);
+  color: #EA580C;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* Night Theme Popover Card */
+html[data-theme="night"] .user-popover-card {
+  background: linear-gradient(135deg, rgba(13, 7, 24, 0.96), rgba(8, 5, 18, 0.94));
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.35), 0 0 24px rgba(124, 58, 237, 0.08);
+}
+
+html[data-theme="night"] .popover-header {
+  color: #F5F3FF;
+}
+
+html[data-theme="night"] .popover-user-icon {
+  color: #C084FC;
+}
+
+html[data-theme="night"] .popover-email {
+  color: rgba(226, 220, 240, 0.68);
+}
+
+html[data-theme="night"] .role-badge-admin {
+  background: rgba(236, 72, 153, 0.15);
+  color: #F472B6;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+html[data-theme="night"] .role-badge-owner {
+  background: rgba(249, 115, 22, 0.15);
+  color: #FB923C;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.5rem 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface-strong);
+  border-color: var(--primary);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Common Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #07111F;
+  box-shadow: 0 4px 14px var(--shadow-glow);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- NAVBAR TEXT SLIDE & GLOW EFFECT --- */
+.nav-text-effect {
+  position: relative !important;
+  display: inline-block !important;
+  overflow: hidden !important;
+  vertical-align: middle !important;
+  line-height: 1.2 !important;
+}
+
+.nav-text-base {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.nav-text-hover {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, text-shadow 0.25s ease, visibility 0.25s ease;
+  color: inherit;
+  white-space: nowrap;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+/* Hover state on the navbar button/link */
+.site-header .nav-actions .btn:hover .nav-text-base,
+.site-header .nav-actions a:hover .nav-text-base,
+.site-header .nav-actions button:hover .nav-text-base,
+.nav-text-effect:hover .nav-text-base {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.site-header .nav-actions .btn:hover .nav-text-hover,
+.site-header .nav-actions a:hover .nav-text-hover,
+.site-header .nav-actions button:hover .nav-text-hover,
+.nav-text-effect:hover .nav-text-hover {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible !important;
+}
+
+/* Day / Night Theme Glow Accent Rules */
+html[data-theme="day"] .site-header .nav-actions .btn:hover .nav-text-hover,
+html[data-theme="day"] .site-header .nav-actions a:hover .nav-text-hover,
+html[data-theme="day"] .site-header .nav-actions button:hover .nav-text-hover,
+html:not([data-theme="night"]) .site-header .nav-actions .btn:hover .nav-text-hover {
+  text-shadow: 0 0 8px rgba(255, 138, 77, 0.65), 0 0 14px rgba(232, 91, 122, 0.4);
+  color: var(--primary, #FF8A4D);
+}
+
+html[data-theme="night"] .site-header .nav-actions .btn:hover .nav-text-hover,
+html[data-theme="night"] .site-header .nav-actions a:hover .nav-text-hover,
+html[data-theme="night"] .site-header .nav-actions button:hover .nav-text-hover {
+  text-shadow: 0 0 10px rgba(193, 60, 138, 0.75), 0 0 18px rgba(243, 140, 203, 0.5);
+  color: var(--accent, #F38CCB);
+}
+
+/* Active page style preservation */
+.site-header .nav-actions .btn.active:hover .nav-text-hover,
+.site-header .nav-actions a.active:hover .nav-text-hover {
+  color: var(--primary);
+}
+
+html[data-theme="night"] .site-header .nav-actions .btn.active:hover .nav-text-hover,
+html[data-theme="night"] .site-header .nav-actions a.active:hover .nav-text-hover {
+  color: var(--primary, #C13C8A);
+  text-shadow: 0 0 10px rgba(234, 90, 190, 0.8), 0 0 20px rgba(124, 58, 237, 0.6);
+}
+
+/* Persistent route-based navbar indicator; visual properties only. */
+html[data-theme="day"] .site-header .nav-actions .btn.active,
+html[data-theme="day"] .site-header .nav-actions .btn.active:hover {
+  color: var(--primary, #FF8A4D);
+  background: rgba(255, 138, 77, 0.08);
+  box-shadow: 0 0 12px rgba(232, 91, 122, 0.15);
+  text-shadow: 0 0 8px rgba(255, 138, 77, 0.48);
+}
+
+html[data-theme="night"] .site-header .nav-actions .btn.active,
+html[data-theme="night"] .site-header .nav-actions .btn.active:hover {
+  color: var(--secondary-color, #F38CCB);
+  background: rgba(193, 60, 138, 0.08);
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.15);
+  text-shadow: 0 0 8px rgba(243, 140, 203, 0.62);
+}
+
+.site-header .nav-actions .btn.active .nav-text-base,
+.site-header .nav-actions .btn.active:hover .nav-text-hover {
+  color: inherit !important;
+  text-shadow: inherit !important;
+}

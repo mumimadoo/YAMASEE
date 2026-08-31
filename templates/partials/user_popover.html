@@ -1,0 +1,22 @@
+{% if user %}
+<div class="user-chip-wrapper">
+    <button type="button" class="user-chip" id="userChipBtn" aria-expanded="false" aria-haspopup="true">
+        <span class="user-chip-icon">👤</span>
+        <span class="user-chip-name">{{ user.username }}</span>
+    </button>
+    <div class="user-popover-card" id="userPopoverCard" style="display: none;" role="dialog">
+        <div class="popover-header">
+            <span class="popover-user-icon">👤</span>
+            <span class="popover-username">{{ user.username }}</span>
+        </div>
+        <div class="popover-email">{{ user.email }}</div>
+        {% if user and (user.role in ['admin', 'owner'] or user.is_admin) %}
+        <div class="popover-role-wrapper">
+            <span class="popover-badge role-badge-{{ user.role if user.role in ['admin', 'owner'] else ('admin' if user.is_admin else 'user') }}">
+                {% if user.role == 'owner' %}Owner{% else %}Admin{% endif %}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

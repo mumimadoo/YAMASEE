@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="day">
+<head>
+    {% include "partials/auth_theme_script.html" %}
+    {% include "partials/auth_head.html" %}
+    <link rel="stylesheet" href="/static/css/landing.css">
+    <style>
+        /* Smooth scrolling behavior for anchors */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <header class="site-header">
+        <a href="/landing" class="brand-logo">
+            <img src="/static/Logo_boy.png" alt="YAMASEE Logo">
+            <span>YAMASEE</span>
+        </a>
+        <div class="nav-actions">
+            {% if user %}
+            {% include "partials/user_popover.html" %}
+            <a href="/landing" class="btn btn-outline active"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/dashboard" class="btn btn-outline"><span class="nav-text-effect" data-text="Dashboard"><span class="nav-text-base">Dashboard</span><span class="nav-text-hover" aria-hidden="true">Dashboard</span></span></a>
+            <a href="/comparison" class="btn btn-outline"><span class="nav-text-effect" data-text="Compare"><span class="nav-text-base">Compare</span><span class="nav-text-hover" aria-hidden="true">Compare</span></span></a>
+            {% if user and (user.role in ['admin', 'owner'] or user.is_admin) %}
+            <a href="/admin" class="btn btn-outline"><span class="nav-text-effect" data-text="Admin"><span class="nav-text-base">Admin</span><span class="nav-text-hover" aria-hidden="true">Admin</span></span></a>
+            {% endif %}
+            <button type="button" class="btn btn-outline btn-logout" id="navLogoutBtn"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% else %}
+            <a href="/landing" class="btn btn-outline active"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/login" class="btn btn-outline" id="navLoginBtn"><span class="nav-text-effect" data-text="Login"><span class="nav-text-base">Login</span><span class="nav-text-hover" aria-hidden="true">Login</span></span></a>
+            <a href="/register" class="btn btn-primary" id="navRegisterBtn"><span class="nav-text-effect" data-text="Sign Up"><span class="nav-text-base">Sign Up</span><span class="nav-text-hover" aria-hidden="true">Sign Up</span></span></a>
+            <button type="button" class="btn btn-outline btn-logout" id="navLogoutBtn" style="display: none;"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% endif %}
+            {% include "partials/theme_switch.html" %}
+        </div>
+    </header>
+
+    <main class="landing-container">
+        <!-- SECTION 1: HERO -->
+        <section class="hero-section fade-in-up">
+            <div class="hero-left">
+                <h1 class="hero-title-main">AI Multimedia Analysis Platform</h1>
+                <p class="hero-description">
+                    แพลตฟอร์มวิเคราะห์สื่อวิดีโอด้วย AI สำหรับการถอดเสียง วิเคราะห์อารมณ์ วิเคราะห์การสื่อสาร และสร้างรายงานเชิงยุทธศาสตร์
+                </p>
+                <div class="hero-cta-group">
+                    <a href="/dashboard" class="btn btn-primary">🚀 Start Analysis</a>
+                    <a href="#demo-section" class="btn btn-outline">View Demo</a>
+                </div>
+            </div>
+            
+            <div class="hero-right">
+                <!-- Live Mini Dashboard Preview (Section 2) -->
+                <div class="mini-dashboard-preview glass-card">
+                    <div class="mini-header">
+                        <div class="mini-logo">
+                            <img src="/static/Logo_boy.png" alt="Logo">
+                            <span>YAMASEE</span>
+                        </div>
+                        <div class="mini-actions">
+                            <div class="mini-dot"></div>
+                            <span>Active System</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mini-body">
+                        <!-- Left Column (Mockup Player) -->
+                        <div class="mini-col mini-col-left">
+                            <div class="mini-box">
+                                <div class="mini-box-title">📍 แหล่งข้อมูล</div>
+                                <div class="mini-radio-row">
+                                    <span>⚫ ลิงก์ภายนอก</span>
+                                    <span>⚪ อัปโหลดไฟล์</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mini-box">
+                                <div class="mini-box-title">🎬 ส่วนแสดงผลวิดีโอ</div>
+                                <div class="mini-player-wrapper">
+                                    <div class="mini-player-poster">
+                                        <div class="mini-play-btn">
+                                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="mini-badge">😊 Confident</div>
+                                    </div>
+                                </div>
+                                <div class="mini-controls">
+                                    <span class="mini-play-btn" style="width: 14px; height: 14px;">
+                                        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 6px; height: 6px;"><path d="M8 5v14l11-7z"/></svg>
+                                    </span>
+                                    <div class="mini-progress-bar">
+                                        <div class="mini-progress-fill"></div>
+                                    </div>
+                                    <span>01:45 / 04:30</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mini-box">
+                                <span>📍 พิกัดเวลาตรวจสอบ: 01:45</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column (Mockup Modules) -->
+                        <div class="mini-col mini-col-right">
+                            <div class="mini-box">
+                                <div class="mini-box-title">📋 รายละเอียดไฟล์</div>
+                                <div>ชื่อ: คลิปบรรยายการประชุม.mp4</div>
+                                <div>ขนาด: 24.5 เมกะไบต์</div>
+                            </div>
+                            
+                            <div class="mini-box" style="flex-grow: 1; display: flex; flex-direction: column;">
+                                <div class="mini-box-title">📊 เลือกโมดูลวิเคราะห์</div>
+                                <select class="mini-select">
+                                    <option>โมดูลที่ 1: ลำดับบันทึกข้อความถอดความคำพูด</option>
+                                </select>
+                                <div style="margin-top: 0.35rem; display: flex; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.25rem;">
+                                    <span>🔍 </span>
+                                    <span class="mini-input-cursor" style="margin-left: 0.25rem; font-size: 0.55rem; color: var(--text-secondary);">ป้อนคำสำคัญ...</span>
+                                </div>
+                                
+                                <div class="mini-transcript-list" style="margin-top: 0.5rem;">
+                                    <div class="mini-row">
+                                        <span class="mini-time">00:15</span>
+                                        <span>ยินดีต้อนรับผู้เข้าร่วมประชุมทุกท่าน...</span>
+                                    </div>
+                                    <div class="mini-row active">
+                                        <span class="mini-time">01:45</span>
+                                        <span>เราจำเป็นต้องปรับทิศทางของกลยุทธ์หลัก...</span>
+                                    </div>
+                                    <div class="mini-row">
+                                        <span class="mini-time">03:20</span>
+                                        <span>ขอขอบคุณและปิดการประชุมสัมมนา...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: WHAT YOU'LL GET -->
+        <section class="why-yamasee-section fade-in-up">
+            <div class="section-header-centered">
+                <h2 class="section-title">What You'll Get</h2>
+                <p class="section-subtitle-small">คุณสมบัติหลักของระบบและผลลัพธ์ที่จะช่วยเพิ่มประสิทธิภาพในการวิเคราะห์ข้อมูล</p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Card 1 -->
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🎤</div>
+                    <h3>Transcript Timeline</h3>
+                    <p class="feature-desc">ถอดเสียงพร้อมระบุเวลา ค้นหาข้อความย้อนหลังได้ทันที</p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">😊</div>
+                    <h3>Emotion Analysis</h3>
+                    <p class="feature-desc">วิเคราะห์อารมณ์ และแนวโน้มของการพูด</p>
+                </div>
+                
+                <!-- Card 3 -->
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Communication Analysis</h3>
+                    <p class="feature-desc">วิเคราะห์การสื่อสาร น้ำเสียง และวาทศิลป์</p>
+                </div>
+                
+                <!-- Card 4 -->
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">📄</div>
+                    <h3>Executive Report</h3>
+                    <p class="feature-desc">สร้างเอกสารรายงานพร้อมใช้งานทันที</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ANALYSIS WORKFLOW -->
+        <section class="analysis-workflow-section fade-in-up">
+            <div class="section-header-centered">
+                <h2 class="section-title">Analysis Workflow</h2>
+                <p class="section-subtitle-small">กระบวนการวิเคราะห์ของระบบ</p>
+            </div>
+            
+            <div class="pipeline-flow">
+                <!-- Video -->
+                <div class="pipeline-step">
+                    <div class="pipeline-step-icon">📹</div>
+                    <div class="pipeline-step-title">Video</div>
+                </div>
+                
+                <div class="pipeline-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <!-- Speech-to-Text -->
+                <div class="pipeline-step">
+                    <div class="pipeline-step-icon">🎙️</div>
+                    <div class="pipeline-step-title">Speech-to-Text</div>
+                </div>
+                
+                <div class="pipeline-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="pipeline-step">
+                    <div class="pipeline-step-icon">⏰</div>
+                    <div class="pipeline-step-title">Timeline</div>
+                </div>
+                
+                <div class="pipeline-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <!-- AI Analysis -->
+                <div class="pipeline-step">
+                    <div class="pipeline-step-icon">🧠</div>
+                    <div class="pipeline-step-title">AI Analysis</div>
+                </div>
+                
+                <div class="pipeline-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <!-- Dashboard -->
+                <div class="pipeline-step">
+                    <div class="pipeline-step-icon">💻</div>
+                    <div class="pipeline-step-title">Dashboard</div>
+                </div>
+                
+                <div class="pipeline-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <!-- PDF Report -->
+                <div class="pipeline-step">
+                    <div class="pipeline-step-icon">📄</div>
+                    <div class="pipeline-step-title">PDF Report</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: DASHBOARD PREVIEW -->
+        <section id="demo-section" class="dashboard-preview-section fade-in-up">
+            <div class="section-header-centered">
+                <h2 class="section-title">Inside YAMASEE Dashboard</h2>
+                <p class="section-subtitle-small">ภาพรวมของแดชบอร์ดจริง</p>
+            </div>
+            
+            <!-- Real Dashboard Layout Replica (Section 5) -->
+            <div class="real-dashboard-preview glass-card">
+                <div class="real-dashboard-header">
+                    <div class="mock-window-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="real-dashboard-address">dashboard.yamasee.ai/analysis/job_x98f2</div>
+                </div>
+                
+                <div class="real-dashboard-body">
+                    <!-- COLUMN LEFT (Box 1 & Box 3) -->
+                    <div class="real-dashboard-col real-dashboard-col-left">
+                        <!-- BOX 1: ที่มาของแหล่งข้อมูลมีเดีย -->
+                        <div class="dashboard-box-mimic">
+                            <h3 class="box-title-mimic">📍 ที่มาของแหล่งข้อมูลมีเดีย:</h3>
+                            <div class="mini-radio-row">
+                                <span>⚫ ลิงก์ภายนอก (YouTube / TikTok)</span>
+                                <span>⚪ อัปโหลดไฟล์วิดีโอ (MP4 Local File)</span>
+                            </div>
+                        </div>
+                        
+                        <!-- BOX 3: ที่แสดง คลิป vdo -->
+                        <div class="dashboard-box-mimic player-box-mimic">
+                            <h3 class="box-title-mimic">🎬 ที่แสดง คลิป vdo</h3>
+                            <div class="video-mood-badge-mimic">😊 อารมณ์ปัจจุบัน: Confident</div>
+                            <div class="player-wrapper-mimic">
+                                <div class="player-poster-mimic">
+                                    <div class="player-play-mimic">
+                                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="player-meta-mimic">
+                                <span>📍 พิกัดเวลาตรวจสอบปัจจุบัน: 01:45 นาที</span>
+                                <span>🤖 สถาปัตยกรรม AI ประมวลผล: Multi-Model Analysis</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Segment -->
+                        <div class="dashboard-box-mimic">
+                            <h3 class="box-title-mimic">📊 Sentiment Dynamics Timeline</h3>
+                            <div class="mock-timeline-viz">
+                                <div class="timeline-segment segment-positive" style="width: 35%;">
+                                    <span class="seg-label">เชิงบวก (0-1:15)</span>
+                                </div>
+                                <div class="timeline-segment segment-neutral" style="width: 40%;">
+                                    <span class="seg-label">ทั่วไป (1:15-3:10)</span>
+                                </div>
+                                <div class="timeline-segment segment-negative" style="width: 25%;">
+                                    <span class="seg-label">เชิงลบ (3:10-4:30)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- COLUMN RIGHT (Box 2 & Box 4) -->
+                    <div class="real-dashboard-col">
+                        <!-- BOX 2: รายละเอียด -->
+                        <div class="dashboard-box-mimic">
+                            <h3 class="box-title-mimic">📋 รายละเอียด</h3>
+                            <div class="details-content-mimic">
+                                <div class="detail-row-mimic">
+                                    <span class="detail-label-mimic">ชื่อ :</span>
+                                    <span class="detail-value-mimic">คลิปบันทึกเสียงผู้บรรยาย.mp4</span>
+                                </div>
+                                <div class="detail-row-mimic">
+                                    <span class="detail-label-mimic">ขนาดไฟล์ :</span>
+                                    <span class="detail-value-mimic">24.5 เมกะไบต์</span>
+                                </div>
+                                <div class="detail-row-mimic">
+                                    <span class="detail-label-mimic">เวลาทั้งหมดในการวิเคราะห์ :</span>
+                                    <span class="detail-value-mimic">12 วินาที</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- BOX 4: แผงควบคุมโมดูลระบบวิเคราะห์ข้อมูล -->
+                        <div class="dashboard-box-mimic" style="flex-grow: 1; display: flex; flex-direction: column; gap: 0.85rem;">
+                            <h3 class="box-title-mimic">📊 แผงควบคุมโมดูลระบบวิเคราะห์ข้อมูล (8 Modules Dashboard):</h3>
+                            <select class="select-menu-mimic">
+                                <option>📜 โมดูลที่ 1: ลำดับบันทึกข้อความถอดความคำพูด (Transcript Timeline)</option>
+                            </select>
+                            
+                            <div style="display: flex; gap: 0.5rem; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 0.4rem 0.65rem;">
+                                <span>🔍</span>
+                                <span style="font-size: 0.8rem; color: var(--text-secondary);">ป้อนคำสำคัญที่ต้องการตรวจสอบเพื่อกรองข้อมูลประโยค...</span>
+                            </div>
+                            
+                            <div class="transcript-list-mimic">
+                                <div class="transcript-row-mimic">
+                                    <span class="time-badge-mimic">00:15</span>
+                                    <p class="phrase-text-mimic">ยินดีต้อนรับเข้าสู่ระบบถอดความและวิเคราะห์ข้อมูลระดับยุทธศาสตร์ YAMASEE ครับ...</p>
+                                </div>
+                                <div class="transcript-row-mimic">
+                                    <span class="time-badge-mimic">01:02</span>
+                                    <p class="phrase-text-mimic">ระบบได้ยินเสียงพูดและทำการแยกแยะแบบเรียลไทม์ พร้อมจับอารมณ์ผู้พูด...</p>
+                                </div>
+                                <div class="transcript-row-mimic active">
+                                    <span class="time-badge-mimic">01:45</span>
+                                    <p class="phrase-text-mimic">ผู้ใช้งานสามารถคลิกเลือกตามแต่ละวินาที เพื่อกระโดดไปยังพิกัดเวลานั้น...</p>
+                                </div>
+                                <div class="transcript-row-mimic">
+                                    <span class="time-badge-mimic">02:30</span>
+                                    <p class="phrase-text-mimic">พร้อมทั้งสามารถกดส่งออกเอกสารและรายงานบทสรุปผู้บริหารได้ทันที...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: SYSTEM HIGHLIGHTS -->
+        <section class="system-highlights-section fade-in-up">
+            <div class="highlights-grid">
+                <div class="highlight-item">
+                    <div class="highlight-value">9 AI Modules</div>
+                    <div class="highlight-label">ระบบวิเคราะห์อัจฉริยะ 9 โมดูล</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-value">Timeline</div>
+                    <div class="highlight-label">ถอดเสียงพร้อมระบุเวลา</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-value">History Restore</div>
+                    <div class="highlight-label">เปิดผลวิเคราะห์ย้อนหลังได้ทันที</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-value">Executive PDF</div>
+                    <div class="highlight-label">สร้างรายงานพร้อมใช้งาน</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-value">Day / Night</div>
+                    <div class="highlight-label">รองรับธีมกลางวันและกลางคืน</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: FINAL CTA -->
+        <section class="final-cta-section fade-in-up">
+            <div class="cta-card glass-card">
+                <!-- Silhouette Background -->
+                <div class="cta-silhouette">
+                    <div class="silhouette-col">
+                        <div class="silhouette-box"></div>
+                        <div class="silhouette-box" style="flex-grow: 1;"></div>
+                    </div>
+                    <div class="silhouette-col">
+                        <div class="silhouette-box"></div>
+                        <div class="silhouette-box" style="flex-grow: 1;"></div>
+                    </div>
+                </div>
+                
+                <!-- Active Content -->
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to Analyze Your First Video?</h2>
+                    <p class="cta-subtitle">เริ่มต้นใช้งานระบบถอดความและวิเคราะห์ข้อมูลอัจฉริยะได้ทันที</p>
+                    <div class="cta-actions">
+                        <a href="/dashboard" class="btn btn-primary btn-large">⚡ Start Analysis</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <span class="footer-brand">YAMASEE</span>
+            {% set footer_stats = get_footer_stats() %}
+            <p class="footer-stats">วิเคราะห์แล้ว {{ footer_stats.total_analysis_runs }} คลิป</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.authenticated && data.user) {
+                    const navLogin = document.getElementById('navLoginBtn');
+                    const navRegister = document.getElementById('navRegisterBtn');
+                    const navLogout = document.getElementById('navLogoutBtn');
+                    if (navLogin) navLogin.style.display = 'none';
+                    if (navRegister) navRegister.style.display = 'none';
+                    if (navLogout) {
+                        navLogout.style.display = 'inline-flex';
+                        navLogout.addEventListener('click', async () => {
+                            await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+                            window.location.reload();
+                        });
+                    }
+                }
+            } catch(e) {}
+        });
+    </script>
+</body>
+</html>

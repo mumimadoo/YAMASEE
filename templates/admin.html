@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="day">
+<head>
+    {% include "partials/auth_theme_script.html" %}
+    {% include "partials/auth_head.html" %}
+    <link rel="stylesheet" href="/static/css/auth-shared.css?v=1.3.0">
+    <link rel="stylesheet" href="/static/css/admin.css?v=1.1.6">
+    <script src="/static/js/admin.js?v=1.1.6" defer></script>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <header class="site-header">
+        <a href="/landing" class="brand-logo">
+            <img src="/static/Logo_boy.png" alt="YAMASEE Logo">
+            <span>YAMASEE</span>
+        </a>
+        <div class="nav-actions">
+            {% include "partials/user_popover.html" %}
+            <a href="/landing" class="btn btn-outline"><span class="nav-text-effect" data-text="Home"><span class="nav-text-base">Home</span><span class="nav-text-hover" aria-hidden="true">Home</span></span></a>
+            <a href="/dashboard" class="btn btn-outline"><span class="nav-text-effect" data-text="Dashboard"><span class="nav-text-base">Dashboard</span><span class="nav-text-hover" aria-hidden="true">Dashboard</span></span></a>
+            <a href="/history" class="btn btn-outline"><span class="nav-text-effect" data-text="History"><span class="nav-text-base">History</span><span class="nav-text-hover" aria-hidden="true">History</span></span></a>
+            <a href="/comparison" class="btn btn-outline"><span class="nav-text-effect" data-text="Compare"><span class="nav-text-base">Compare</span><span class="nav-text-hover" aria-hidden="true">Compare</span></span></a>
+            {% if user and (user.role in ['admin', 'owner'] or user.is_admin) %}
+            <a href="/admin" class="btn btn-outline active"><span class="nav-text-effect" data-text="Admin"><span class="nav-text-base">Admin</span><span class="nav-text-hover" aria-hidden="true">Admin</span></span></a>
+            {% endif %}
+            <button type="button" id="logoutBtn" class="btn btn-outline btn-logout"><span class="nav-text-effect" data-text="Logout"><span class="nav-text-base">Logout</span><span class="nav-text-hover" aria-hidden="true">Logout</span></span></button>
+            {% include "partials/theme_switch.html" %}
+        </div>
+    </header>
+
+    <main class="admin-page-wrapper">
+        <div class="admin-header-compact">
+            <div class="admin-title-area">
+                <h1 class="admin-title-text">🔐 Admin Center</h1>
+                <p class="admin-subtitle-text">จัดการผู้ใช้งานและสิทธิ์ในระบบ</p>
+            </div>
+            <nav class="admin-tabs-nav" aria-label="Admin Center Navigation">
+                <button type="button" class="tab-btn active" data-tab="users">👥 จัดการผู้ใช้</button>
+                <button type="button" class="tab-btn" data-tab="status">📊 สถานะระบบ</button>
+                <button type="button" class="tab-btn" data-tab="jobs">⚡ งานที่ประมวลผล</button>
+                <button type="button" class="tab-btn" data-tab="audit">📋 บันทึกการทำงาน</button>
+                <button type="button" class="tab-btn" data-tab="run-history">🎬 ประวัติการประมวลผล</button>
+                <button type="button" class="tab-btn" data-tab="analysis-history">📚 Analysis History</button>
+            </nav>
+        </div>
+
+        <!-- TAB 1: USERS MANAGEMENT -->
+        <section id="tab-users" class="tab-content active" aria-label="Users Management Tab">
+            <div class="admin-filter-bar">
+                <div class="search-input-group">
+                    <input type="text" id="userSearchInput" placeholder="ค้นหาตามชื่อผู้ใช้ หรือ อีเมล..." aria-label="Search users">
+                </div>
+                <div class="filter-controls-group">
+                    <select id="roleFilterSelect" class="admin-filter-select" aria-label="Filter by Role">
+                        <option value="">สิทธิ์ทั้งหมด (All Roles)</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="owner">Owner</option>
+                    </select>
+                    <select id="statusFilterSelect" class="admin-filter-select" aria-label="Filter by Status">
+                        <option value="">สถานะทั้งหมด (All Statuses)</option>
+                        <option value="active">Active</option>
+                        <option value="disabled">Disabled</option>
+                        <option value="banned">Banned</option>
+                        <option value="deleted">Deleted</option>
+                    </select>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showDeletedCheckbox"> แสดงรายการที่ลบ (Show Deleted)
+                    </label>
+                </div>
+            </div>
+
+            <div class="table-container users-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ผู้ใช้</th>
+                            <th>สิทธิ์</th>
+                            <th>สถานะ</th>
+                            <th>จำนวนงาน</th>
+                            <th>วันที่สมัคร</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Rendered dynamically via static/js/admin.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mobile-user-cards" id="mobileUserCardsContainer">
+                <!-- Rendered dynamically via static/js/admin.js -->
+            </div>
+
+            <div class="pagination-wrapper" id="usersPaginationContainer">
+                <!-- Pagination buttons rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 2: SYSTEM STATUS -->
+        <section id="tab-status" class="tab-content" aria-label="System Status Tab">
+            <div class="admin-filter-bar">
+                <div class="status-card-sub">
+                    <span>ภาพรวมระบบและตัวชี้วัดประสิทธิภาพ</span>
+                </div>
+                <button type="button" id="refreshStatusBtn" class="btn btn-outline">🔄 รีเฟรชสถานะ</button>
+            </div>
+
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-card-header">
+                        <span>👥 ผู้ใช้งานระบบ</span>
+                    </div>
+                    <div class="status-card-value" id="val-total-users">-</div>
+                    <div class="status-card-sub" id="val-admin-users">Admins: -</div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-card-header">
+                        <span>📊 รายการวิเคราะห์ (History)</span>
+                    </div>
+                    <div class="status-card-value" id="val-analysis-records">-</div>
+                    <div class="status-card-sub">บันทึกในฐานข้อมูลทั้งหมด</div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-card-header">
+                        <span>⚡ Jobs ในการประมวลผล</span>
+                    </div>
+                    <div class="status-card-value" id="val-active-jobs">-</div>
+                    <div class="status-card-sub" id="val-jobs-summary">Completed: - | Failed: -</div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-card-header">
+                        <span id="val-db-label">🗄️ ฐานข้อมูล (SQLite)</span>
+                    </div>
+                    <div class="status-card-value" id="val-db-status">-</div>
+                    <div class="status-card-sub" id="val-db-details">WAL: - | Size: -</div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-card-header">
+                        <span>⏱️ ระยะเวลาทำงาน (Uptime)</span>
+                    </div>
+                    <div class="status-card-value" id="val-uptime">-</div>
+                    <div class="status-card-sub">ตั้งแต่เริ่มต้นเซิร์ฟเวอร์</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: ACTIVE JOBS -->
+        <section id="tab-jobs" class="tab-content" aria-label="Active Jobs Tab">
+            <div class="notice-banner">
+                <span>⚠️ งานที่กำลังประมวลผลของ Process ปัจจุบัน (In-memory jobs snapshot)</span>
+            </div>
+
+            <div class="admin-filter-bar">
+                <div class="status-card-sub">
+                    <span>ตรวจสอบสถานะงาน real-time</span>
+                </div>
+                <button type="button" id="refreshJobsBtn" class="btn btn-outline">🔄 รีเฟรชรายการ</button>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>เจ้าของงาน</th>
+                            <th>ประเภทสื่อ</th>
+                            <th>สถานะ</th>
+                            <th>ความคืบหน้า</th>
+                            <th>เวลาเริ่มต้น</th>
+                            <th>การจำแนกข้อผิดพลาด</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobsTableBody">
+                        <!-- Rendered dynamically via static/js/admin.js -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 4: AUDIT LOG -->
+        <section id="tab-audit" class="tab-content" aria-label="Audit Log Tab">
+            <div class="admin-filter-bar" style="flex-wrap: wrap; gap: 0.8rem;">
+                <div class="search-input-group" style="flex: 1 1 200px;">
+                    <input type="text" id="auditSearchInput" placeholder="ค้นหาข้อความ/รายละเอียด..." aria-label="Search audit logs">
+                </div>
+                <div class="filter-controls-group" style="flex: 3 1 600px; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
+                    <select id="auditEventTypeSelect" class="admin-filter-select" aria-label="Filter by Event Type">
+                        <option value="">ประเภทเหตุการณ์ทั้งหมด (All Events)</option>
+                        <option value="user_disabled">ปิดใช้งานบัญชี (Disable)</option>
+                        <option value="user_enabled">เปิดใช้งานบัญชี (Enable)</option>
+                        <option value="user_banned">ระงับบัญชี (Ban)</option>
+                        <option value="user_unbanned">ยกเลิกการระงับ (Unban)</option>
+                        <option value="user_soft_deleted">ลบบัญชี (Soft Delete)</option>
+                        <option value="user_restored">กู้คืนบัญชี (Restore)</option>
+                        <option value="user_promoted_to_admin">แต่งตั้งเป็น Admin</option>
+                        <option value="admin_demoted_to_user">ลดสิทธิ์เป็น User</option>
+                        <option value="password_reset">สร้างรหัสผ่านชั่วคราว</option>
+                        <option value="password_changed">เปลี่ยนรหัสผ่าน</option>
+                        <option value="password_reset_expired_login">ใช้รหัสผ่านชั่วคราวหมดอายุ</option>
+                    </select>
+                    <input type="text" id="auditActorInput" class="admin-filter-select" style="width: 130px; padding: 0.4rem 0.6rem;" placeholder="ผู้กระทำ (Actor)..." aria-label="Actor username">
+                    <input type="text" id="auditTargetInput" class="admin-filter-select" style="width: 130px; padding: 0.4rem 0.6rem;" placeholder="ผู้ได้รับผล (Target)..." aria-label="Target username">
+                    <input type="date" id="auditDateFromInput" class="admin-filter-select" style="width: 130px;" aria-label="Date From">
+                    <input type="date" id="auditDateToInput" class="admin-filter-select" style="width: 130px;" aria-label="Date To">
+                    <select id="auditPageSizeSelect" class="admin-filter-select" aria-label="Page Size" style="width: 80px;">
+                        <option value="10">10 แถว</option>
+                        <option value="25" selected>25 แถว</option>
+                        <option value="50">50 แถว</option>
+                        <option value="100">100 แถว</option>
+                    </select>
+                    <button type="button" id="resetAuditFiltersBtn" class="btn btn-outline" style="padding: 0.4rem 0.8rem;">เคลียร์ฟิลเตอร์</button>
+                    <button type="button" id="exportAuditCsvBtn" class="btn btn-outline btn-promote" style="padding: 0.4rem 0.8rem; border-color: var(--status-success-color); color: var(--status-success-color);">📥 ส่งออก CSV</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>เวลา (Time UTC)</th>
+                            <th>ประเภทเหตุการณ์ (Event)</th>
+                            <th>ผู้กระทำ (Actor)</th>
+                            <th>ผู้ได้รับผล (Target)</th>
+                            <th>สิทธิ์/สถานะ (ก่อนหน้า)</th>
+                            <th>สิทธิ์/สถานะ (หลังทำ)</th>
+                            <th>IP Address</th>
+                            <th style="text-align: center;">การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <!-- Rendered dynamically via static/js/admin.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="admin-pagination-bar" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div class="pagination-info" style="font-size: 0.85rem; color: var(--text-secondary);">
+                    แสดงผลทั้งหมด <span id="auditTotalRecords">0</span> รายการ (หน้า <span id="auditCurrentPage">1</span> จาก <span id="auditTotalPages">1</span>)
+                </div>
+                <div class="pagination-controls" style="display: flex; gap: 0.4rem;">
+                    <button type="button" id="auditFirstPageBtn" class="btn btn-outline btn-sm">First</button>
+                    <button type="button" id="auditPrevPageBtn" class="btn btn-outline btn-sm">Prev</button>
+                    <button type="button" id="auditNextPageBtn" class="btn btn-outline btn-sm">Next</button>
+                    <button type="button" id="auditLastPageBtn" class="btn btn-outline btn-sm">Last</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: ANALYSIS RUN HISTORY -->
+        <section id="tab-run-history" class="tab-content" aria-label="Analysis Run History Tab">
+            <div class="admin-filter-bar" style="flex-wrap: wrap; gap: 0.8rem;">
+                <div class="search-input-group" style="flex: 1 1 200px;">
+                    <input type="text" id="runHistorySearchInput" placeholder="ค้นหาชื่อไฟล์, ลิงก์, ผู้ใช้งาน, โมเดล..." aria-label="Search run history">
+                </div>
+                <div class="filter-controls-group" style="flex: 3 1 600px; display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end;">
+                    <select id="runHistorySourceTypeSelect" class="admin-filter-select" aria-label="Filter by Source Type">
+                        <option value="">แหล่งมีเดียทั้งหมด (All Sources)</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="local">Local Upload</option>
+                    </select>
+                    <input type="date" id="runHistoryDateFromInput" class="admin-filter-select" style="width: 130px;" aria-label="Date From">
+                    <input type="date" id="runHistoryDateToInput" class="admin-filter-select" style="width: 130px;" aria-label="Date To">
+                    <select id="runHistorySortOrderSelect" class="admin-filter-select" aria-label="Sort Order" style="width: 140px;">
+                        <option value="desc" selected>ล่าสุดก่อน (Newest First)</option>
+                        <option value="asc">เก่าสุดก่อน (Oldest First)</option>
+                    </select>
+                    <select id="runHistoryPageSizeSelect" class="admin-filter-select" aria-label="Page Size" style="width: 80px;">
+                        <option value="10">10 แถว</option>
+                        <option value="25" selected>25 แถว</option>
+                        <option value="50">50 แถว</option>
+                        <option value="100">100 แถว</option>
+                    </select>
+                    <button type="button" id="resetRunHistoryFiltersBtn" class="btn btn-outline" style="padding: 0.4rem 0.8rem;">เคลียร์ฟิลเตอร์</button>
+                    <button type="button" id="exportRunHistoryCsvBtn" class="btn btn-outline btn-promote" style="padding: 0.4rem 0.8rem; border-color: var(--status-success-color); color: var(--status-success-color);">📥 ส่งออก CSV</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>เวลา (Date/Time)</th>
+                            <th>ผู้ใช้งาน (User)</th>
+                            <th>แหล่งมีเดีย (Source Type)</th>
+                            <th>ชื่อไฟล์ / ลิงก์ (File Name or URL)</th>
+                            <th>โมเดลที่ใช้ (Model)</th>
+                            <th style="text-align: right;">ความยาว (Duration)</th>
+                            <th style="text-align: right;">ประมวลผล (Processing)</th>
+                            <th style="text-align: right;">จำนวนคำ (Words)</th>
+                            <th style="text-align: right;">คำต่อนาที (WPM)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="runHistoryTableBody">
+                        <!-- Rendered dynamically via javascript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="admin-pagination-bar" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div class="pagination-info" style="font-size: 0.85rem; color: var(--text-secondary);">
+                    แสดงผลทั้งหมด <span id="runHistoryTotalRecords">0</span> รายการ (หน้า <span id="runHistoryCurrentPage">1</span> จาก <span id="runHistoryTotalPages">1</span>)
+                </div>
+                <div class="pagination-controls" style="display: flex; gap: 0.4rem;">
+                    <button type="button" id="prevRunHistoryPageBtn" class="btn btn-outline" style="padding: 0.3rem 0.6rem;">&laquo; ก่อนหน้า</button>
+                    <button type="button" id="nextRunHistoryPageBtn" class="btn btn-outline" style="padding: 0.3rem 0.6rem;">ถัดไป &raquo;</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: ANALYSIS HISTORY -->
+        <section id="tab-analysis-history" class="tab-content" aria-label="Analysis History Tab">
+            <!-- Sub-tab Mode Switcher -->
+            <div class="admin-filter-bar" style="justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <div class="history-mode-selector" style="display: flex; gap: 0.5rem;">
+                    <button type="button" id="modeAnalysisBtn" class="btn btn-primary" style="padding: 0.4rem 1rem; border-radius: 8px;">🎬 Video Analysis</button>
+                    <button type="button" id="modeComparisonBtn" class="btn btn-outline" style="padding: 0.4rem 1rem; border-radius: 8px;">⚖️ Video Comparison</button>
+                </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="admin-filter-bar" style="margin-top: 0.75rem;">
+                <div class="search-input-group" style="flex: 1; min-width: 220px;">
+                    <input type="text" id="adminHistorySearchInput" placeholder="ค้นหาตามชื่อผู้ใช้, ชื่อไฟล์, หรือ URL..." aria-label="Search analysis history">
+                </div>
+                <div class="filter-controls-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <input type="text" id="adminHistoryUserFilter" class="admin-filter-select" placeholder="ผู้ใช้ (User)..." style="width: 130px; padding: 0.4rem 0.6rem;">
+                    <select id="adminHistorySourceTypeSelect" class="admin-filter-select" aria-label="Filter by Source Type">
+                        <option value="">แหล่งมีเดียทั้งหมด</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="upload">Upload</option>
+                    </select>
+                    <select id="adminHistoryModelSelect" class="admin-filter-select" aria-label="Filter by Model">
+                        <option value="">โมเดลทั้งหมด</option>
+                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                        <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                    </select>
+                    <select id="adminHistorySortSelect" class="admin-filter-select" aria-label="Sort Order">
+                        <option value="newest">ใหม่สุดก่อน</option>
+                        <option value="oldest">เก่าสุดก่อน</option>
+                    </select>
+                    <select id="adminHistoryPageSizeSelect" class="admin-filter-select" aria-label="Page Size">
+                        <option value="25">25 รายการ</option>
+                        <option value="50">50 รายการ</option>
+                        <option value="100">100 รายการ</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Date Range Filters Bar -->
+            <div class="admin-filter-bar" style="margin-top: 0.5rem;">
+                <div class="filter-controls-group" style="width: 100%; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <label style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.3rem;">
+                        ตั้งแต่วันที่:
+                        <input type="date" id="adminHistoryDateFromInput" class="admin-filter-select" style="padding: 0.3rem 0.5rem;">
+                    </label>
+                    <label style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.3rem;">
+                        ถึงวันที่:
+                        <input type="date" id="adminHistoryDateToInput" class="admin-filter-select" style="padding: 0.3rem 0.5rem;">
+                    </label>
+                    <button type="button" id="adminHistoryResetFiltersBtn" class="btn btn-outline" style="padding: 0.3rem 0.8rem;">เคลียร์ฟิลเตอร์</button>
+                </div>
+            </div>
+
+            <!-- VIDEO ANALYSIS TABLE -->
+            <div id="adminAnalysisTableWrapper" class="table-container" style="margin-top: 1rem;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>เวลา (Date/Time)</th>
+                            <th>ผู้ใช้งาน (User)</th>
+                            <th>ชื่อไฟล์ / ลิงก์ (Title / File Name)</th>
+                            <th>แหล่งมีเดีย (Source)</th>
+                            <th>โมเดล (Model)</th>
+                            <th style="text-align: right;">ความยาว (Duration)</th>
+                            <th>สถานะ (Status)</th>
+                            <th style="text-align: center;">จัดการ (Action)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminAnalysisTableBody">
+                        <!-- Rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- VIDEO COMPARISON TABLE -->
+            <div id="adminComparisonTableWrapper" class="table-container" style="margin-top: 1rem; display: none;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>เวลา (Date/Time)</th>
+                            <th>ผู้ใช้งาน (User)</th>
+                            <th>วิดีโอ A (Video A)</th>
+                            <th>วิดีโอ B (Video B)</th>
+                            <th>โมเดล (Model)</th>
+                            <th>สถานะ (Status)</th>
+                            <th style="text-align: center;">จัดการ (Action)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminComparisonTableBody">
+                        <!-- Rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Loading, Empty, and Error States -->
+            <div id="adminHistoryLoadingState" style="display: none; padding: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 1rem;">
+                ⏳ กำลังโหลดข้อมูล...
+            </div>
+            <div id="adminHistoryEmptyState" style="display: none; padding: 2.5rem; text-align: center; color: var(--text-secondary); font-size: 1rem;">
+                ยังไม่มีประวัติการวิเคราะห์
+            </div>
+            <div id="adminHistoryErrorState" style="display: none; padding: 2.5rem; text-align: center; color: var(--danger); font-size: 1rem;">
+                เกิดข้อผิดพลาดในการโหลดประวัติ
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="admin-pagination-bar" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div class="pagination-info" style="font-size: 0.85rem; color: var(--text-secondary);">
+                    แสดงผลทั้งหมด <span id="adminHistoryTotalRecords">0</span> รายการ (หน้า <span id="adminHistoryCurrentPage">1</span> จาก <span id="adminHistoryTotalPages">1</span>)
+                </div>
+                <div class="pagination-controls" style="display: flex; gap: 0.4rem;">
+                    <button type="button" id="prevAdminHistoryPageBtn" class="btn btn-outline" style="padding: 0.3rem 0.6rem;">&laquo; ก่อนหน้า</button>
+                    <button type="button" id="nextAdminHistoryPageBtn" class="btn btn-outline" style="padding: 0.3rem 0.6rem;">ถัดไป &raquo;</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ACTION CONFIRMATION MODAL -->
+    <div id="adminActionModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card">
+            <h3 id="modalTitle">ยืนยันการดำเนินการ</h3>
+            <div id="modalDescription" style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;"></div>
+            
+            <div id="banReasonGroup" style="display: none;">
+                <label for="banReasonInput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-primary);">ระบุเหตุผลในการระงับบัญชี (Ban Reason):</label>
+                <textarea id="banReasonInput" rows="3" placeholder="ระบุเหตุผลความยาว 3 - 500 ตัวอักษร..."></textarea>
+            </div>
+
+            <div id="confirmUsernameGroup" style="display: none;">
+                <label for="confirmUsernameInput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-primary);">พิมพ์ชื่อผู้ใช้เพื่อยืนยันการ Soft Delete (<span id="targetUsernameLabel" style="color: var(--danger); font-weight: 800;"></span>):</label>
+                <input type="text" id="confirmUsernameInput" placeholder="พิมพ์ชื่อผู้ใช้ให้ถูกต้อง...">
+            </div>
+
+            <div id="modalErrorMessage" style="color: var(--danger); font-size: 0.85rem; display: none;"></div>
+
+            <div class="admin-modal-actions">
+                <button type="button" id="modalCancelBtn" class="btn btn-outline">ยกเลิก</button>
+                <button type="button" id="modalConfirmBtn" class="btn btn-primary">ยืนยันทำรายการ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSWORD RESET MODAL -->
+    <div id="resetPasswordModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card">
+            <h3 id="resetModalTitle">🔐 รีเซ็ตรหัสผ่านชั่วคราว</h3>
+            <div id="resetModalStep1">
+                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    ระบบจะสร้างรหัสผ่านชั่วคราวที่มีอายุใช้งาน 24 ชั่วโมง และบังคับให้ผู้ใช้เปลี่ยนรหัสผ่านเมื่อเข้าสู่ระบบครั้งถัดไป <br>
+                    <strong>* ทุก Session ที่ล็อกอินค้างไว้ของบัญชีนี้จะถูกยกเลิกทันที</strong>
+                </p>
+                <div id="resetModalErrorMessage" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 1rem; display: none;"></div>
+                <div class="admin-modal-actions">
+                    <button type="button" id="resetModalCancelBtn" class="btn btn-outline">ยกเลิก</button>
+                    <button type="button" id="resetModalConfirmBtn" class="btn btn-primary">สร้างรหัสผ่านชั่วคราว</button>
+                </div>
+            </div>
+            <div id="resetModalStep2" style="display: none;">
+                <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    รหัสผ่านชั่วคราวถูกสร้างสำเร็จแล้ว กรุณาคัดลอกรหัสผ่านนี้ส่งต่อให้ผู้ใช้
+                </p>
+                <div class="temp-password-box" style="display: flex; gap: 8px; margin-bottom: 1rem;">
+                    <input type="text" id="tempPasswordOutput" readonly style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid var(--border); font-family: monospace; font-size: 1.1rem; text-align: center; background: var(--bg-surface-sub);">
+                    <button type="button" id="copyTempPasswordBtn" class="btn btn-primary">คัดลอก (Copy)</button>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--danger); font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+                    ⚠️ รหัสผ่านนี้จะแสดงเพียงครั้งเดียวเท่านั้นและไม่สามารถกู้คืนได้อีก!
+                </p>
+                <div class="admin-modal-actions" style="justify-content: center;">
+                    <button type="button" id="resetModalCloseBtn" class="btn btn-outline">ปิดหน้าต่าง</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIT DETAIL MODAL -->
+    <div id="auditDetailModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card" style="max-width: 600px; width: 90%;">
+            <h3>📋 รายละเอียดบันทึกการทำงาน (Audit Log Detail)</h3>
+            <div class="detail-modal-body" style="margin: 1rem 0; max-height: 400px; overflow-y: auto; text-align: left; font-size: 0.9rem; line-height: 1.6;">
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">Audit ID:</div>
+                    <div id="detailAuditId" style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-all;"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">เหตุการณ์ (Event Type):</div>
+                    <div id="detailEventType" style="color: var(--text-primary); font-weight: 700; flex: 1; min-width: 200px; word-break: break-word;"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">ผู้กระทำ (Actor):</div>
+                    <div id="detailActor" style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-word;"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">ผู้ได้รับผล (Target):</div>
+                    <div id="detailTarget" style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-word;"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">บทบาท (Role Change):</div>
+                    <div style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-word;">
+                        <span id="detailRoleBefore"></span> ➡️ <span id="detailRoleAfter"></span>
+                    </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">สถานะ (Status Change):</div>
+                    <div style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-word;">
+                        <span id="detailStatusBefore"></span> ➡️ <span id="detailStatusAfter"></span>
+                    </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">เหตุผล (Reason):</div>
+                    <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column;">
+                        <div id="detailReasonFriendly" style="color: var(--text-primary); white-space: pre-wrap; word-break: break-word;"></div>
+                        <details class="raw-data-toggle" style="margin-top: 0.4rem;">
+                            <summary style="cursor: pointer; color: var(--primary); font-size: 0.8rem; outline: none; user-select: none;">ดูข้อมูลดิบ</summary>
+                            <pre id="detailReasonRaw" style="margin-top: 0.4rem; background: var(--bg-surface-sub, #1e293b); border: 1px solid var(--border, var(--border-color, #334155)); padding: 0.5rem; border-radius: 6px; font-family: monospace; font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all; color: var(--text-primary);"></pre>
+                        </details>
+                    </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">IP Address:</div>
+                    <div id="detailIpAddress" style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-all;"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">User-Agent:</div>
+                    <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column;">
+                        <div id="detailUserAgentFriendly" style="color: var(--text-primary); white-space: pre-wrap; word-break: break-word;"></div>
+                        <details class="raw-data-toggle" style="margin-top: 0.4rem;">
+                            <summary style="cursor: pointer; color: var(--primary); font-size: 0.8rem; outline: none; user-select: none;">ดูข้อมูลดิบ</summary>
+                            <pre id="detailUserAgentRaw" style="margin-top: 0.4rem; background: var(--bg-surface-sub, #1e293b); border: 1px solid var(--border, var(--border-color, #334155)); padding: 0.5rem; border-radius: 6px; font-family: monospace; font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all; color: var(--text-primary);"></pre>
+                        </details>
+                    </div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border, var(--border-color, #e2e8f0)); padding: 0.4rem 0;">
+                    <div style="width: 150px; min-width: 150px; font-weight: 700; color: var(--text-secondary);">เวลาสร้าง (Created At):</div>
+                    <div id="detailCreatedAt" style="color: var(--text-primary); flex: 1; min-width: 200px; word-break: break-word;"></div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+                <button type="button" id="closeAuditDetailBtn" class="btn btn-outline">ปิด (Close)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT USER MODAL -->
+    <div id="editUserModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card" style="max-width: 450px; width: 90%;">
+            <h3>✏️ แก้ไขข้อมูลผู้ใช้งาน</h3>
+            <div style="margin: 1rem 0; text-align: left;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="editDisplayNameInput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-primary);">ชื่อแสดง / ชื่อเต็ม (Full Name):</label>
+                    <input type="text" id="editDisplayNameInput" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-surface-sub); color: var(--text-primary);" placeholder="ระบุชื่อผู้ใช้งาน...">
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="editEmailInput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-primary);">อีเมล (Email):</label>
+                    <input type="email" id="editEmailInput" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-surface-sub); color: var(--text-primary);" placeholder="ระบุอีเมล...">
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="editRoleOutput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-secondary);">บทบาทปัจจุบัน (Role):</label>
+                    <input type="text" id="editRoleOutput" readonly style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-surface-sub); color: var(--text-secondary); cursor: not-allowed;" value="">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="editStatusOutput" style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--text-secondary);">สถานะปัจจุบัน (Status):</label>
+                    <input type="text" id="editStatusOutput" readonly style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-surface-sub); color: var(--text-secondary); cursor: not-allowed;" value="">
+                </div>
+                <div id="editModalSuccessMessage" style="color: var(--success); font-size: 0.85rem; margin-bottom: 1rem; display: none;"></div>
+                <div id="editModalErrorMessage" style="color: var(--danger); font-size: 0.85rem; display: none;"></div>
+            </div>
+            <div class="admin-modal-actions">
+                <button type="button" id="editModalCancelBtn" class="btn btn-outline">ยกเลิก</button>
+                <button type="button" id="editModalConfirmBtn" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER MANAGEMENT MODAL (จัดการ) -->
+    <div id="userManagementModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card" style="max-width: 500px; width: 95%;">
+            <div class="user-management-header">
+                <div class="user-avatar-large" id="mgmtUserAvatar">U</div>
+                <div class="user-meta-large">
+                    <h3 id="mgmtUsername" style="margin: 0; font-size: 1.3rem;">Username</h3>
+                    <div id="mgmtEmail" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">email@example.com</div>
+                    <div class="badges-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <span id="mgmtRoleBadge" class="badge">ROLE</span>
+                        <span id="mgmtStatusBadge" class="badge">STATUS</span>
+                    </div>
+                    <div class="user-stats-row" style="font-size: 0.85rem; color: var(--text-secondary);">
+                        <div>จำนวนงาน: <span id="mgmtJobCount" style="color: var(--text-primary); font-weight: bold;">0</span> | วันที่สมัคร: <span id="mgmtCreatedDate" style="color: var(--text-primary); font-weight: bold;">-</span></div>
+                    </div>
+                </div>
+                <button type="button" class="close-mgmt-btn" id="closeMgmtModalBtn" aria-label="Close user management panel">&times;</button>
+            </div>
+
+            <div class="user-management-body" style="margin-top: 1.5rem; text-align: left; max-height: 70vh; overflow-y: auto;">
+                <!-- If protected owner -->
+                <div id="mgmtProtectedOwnerMsg" class="notice-banner" style="display: none; justify-content: center; background: rgba(0, 188, 212, 0.1); border-color: var(--primary-color); margin-bottom: 1rem;">
+                    <span style="color: var(--primary-color); font-weight: bold;">🛡️ Protected Owner Account</span>
+                </div>
+
+                <!-- บัญชีผู้ใช้ -->
+                <div class="mgmt-section" id="mgmtSectionAccount">
+                    <h4 class="mgmt-section-title">บัญชีผู้ใช้</h4>
+                    <div class="mgmt-actions-list">
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionEdit">
+                            <span class="mgmt-menu-icon">✏️</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">แก้ไขข้อมูล</div>
+                                <div class="mgmt-menu-desc">แก้ไขชื่อแสดง หรือ อีเมลของผู้ใช้</div>
+                            </div>
+                        </button>
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionResetPassword">
+                            <span class="mgmt-menu-icon">🔑</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">รีเซ็ตรหัสผ่าน</div>
+                                <div class="mgmt-menu-desc">สร้างรหัสผ่านชั่วคราวและบังคับเปลี่ยนเมื่อเข้าระบบถัดไป</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- สิทธิ์การใช้งาน -->
+                <div class="mgmt-section" id="mgmtSectionRole">
+                    <h4 class="mgmt-section-title">สิทธิ์การใช้งาน</h4>
+                    <div class="mgmt-actions-list">
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionPromote">
+                            <span class="mgmt-menu-icon">⬆️</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">เลื่อนเป็น Admin</div>
+                                <div class="mgmt-menu-desc">แต่งตั้งผู้ใช้คนนี้ให้มีสิทธิ์เป็นผู้ดูแลระบบ</div>
+                            </div>
+                        </button>
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionDemote">
+                            <span class="mgmt-menu-icon">⬇️</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">ลดสิทธิ์เป็น User</div>
+                                <div class="mgmt-menu-desc">ลดระดับสิทธิ์ของผู้ดูแลระบบคนนี้ลงเป็นผู้ใช้ทั่วไป</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- สถานะบัญชี -->
+                <div class="mgmt-section" id="mgmtSectionStatus">
+                    <h4 class="mgmt-section-title">สถานะบัญชี</h4>
+                    <div class="mgmt-actions-list">
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionEnable">
+                            <span class="mgmt-menu-icon">✅</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">เปิดใช้งาน</div>
+                                <div class="mgmt-menu-desc">เปิดให้บัญชีที่ถูกระงับการชั่วคราวกลับมาเข้าใช้งานได้</div>
+                            </div>
+                        </button>
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionDisable">
+                            <span class="mgmt-menu-icon">🚫</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">ระงับการใช้งาน</div>
+                                <div class="mgmt-menu-desc">ระงับสิทธิ์การใช้งานบัญชีนี้ชั่วคราว</div>
+                            </div>
+                        </button>
+                        <button type="button" class="mgmt-menu-item mgmt-danger-item" id="mgmtActionBan">
+                            <span class="mgmt-menu-icon">🔨</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">Ban</div>
+                                <div class="mgmt-menu-desc">แบนบัญชีนี้อย่างถาวรจากการเข้าใช้ระบบ</div>
+                            </div>
+                        </button>
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionUnban">
+                            <span class="mgmt-menu-icon">🔓</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">ยกเลิก Ban</div>
+                                <div class="mgmt-menu-desc">ปลดแบนเพื่อให้บัญชีนี้สามารถใช้งานได้อีกครั้ง</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- พื้นที่อันตราย -->
+                <div class="mgmt-section" id="mgmtSectionDanger">
+                    <h4 class="mgmt-section-title text-danger">พื้นที่อันตราย</h4>
+                    <div class="mgmt-actions-list">
+                        <button type="button" class="mgmt-menu-item mgmt-danger-item" id="mgmtActionDelete">
+                            <span class="mgmt-menu-icon">🗑️</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">Soft Delete</div>
+                                <div class="mgmt-menu-desc text-danger">ลบบัญชีผู้ใช้นี้ออกจากระบบโดยการทำ Soft Delete</div>
+                            </div>
+                        </button>
+                        <button type="button" class="mgmt-menu-item" id="mgmtActionRestore">
+                            <span class="mgmt-menu-icon">♻️</span>
+                            <div class="mgmt-menu-content">
+                                <div class="mgmt-menu-label">Restore</div>
+                                <div class="mgmt-menu-desc">กู้คืนบัญชีผู้ใช้ที่ถูกลบกลับมาใช้งานได้ตามเดิม</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN ANALYSIS DETAIL MODAL -->
+    <div id="adminAnalysisDetailModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card" style="max-width: 800px; width: 95%; max-height: 90vh;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+                <h3 id="adminAnalysisModalTitle" style="margin: 0;">🎬 ผลการวิเคราะห์ (Analysis Result)</h3>
+                <button type="button" id="closeAdminAnalysisDetailBtn" class="btn btn-outline" style="padding: 0.2rem 0.6rem; font-size: 1.2rem;">&times;</button>
+            </div>
+            <div id="adminAnalysisModalBody" style="margin: 1rem 0; overflow-y: auto; max-height: 70vh; font-size: 0.9rem; line-height: 1.6;">
+                <!-- Dynamically rendered -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN COMPARISON DETAIL MODAL -->
+    <div id="adminComparisonDetailModal" class="admin-modal-overlay" style="display: none;">
+        <div class="admin-modal-card" style="max-width: 850px; width: 95%; max-height: 90vh;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+                <h3 id="adminComparisonModalTitle" style="margin: 0;">⚖️ ผลการเปรียบเทียบ (Comparison Result)</h3>
+                <button type="button" id="closeAdminComparisonDetailBtn" class="btn btn-outline" style="padding: 0.2rem 0.6rem; font-size: 1.2rem;">&times;</button>
+            </div>
+            <div id="adminComparisonModalBody" style="margin: 1rem 0; overflow-y: auto; max-height: 70vh; font-size: 0.9rem; line-height: 1.6;">
+                <!-- Dynamically rendered -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

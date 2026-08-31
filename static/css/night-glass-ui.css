@@ -1,0 +1,183 @@
+/* Shared UI surface treatment for Night theme only. */
+html[data-theme="night"] {
+  --card-bg: linear-gradient(135deg, rgba(13, 7, 24, .82), rgba(8, 5, 18, .76));
+  --card-hover-bg: linear-gradient(135deg, rgba(20, 10, 36, .86), rgba(10, 5, 22, .80));
+  --box-inner-bg: rgba(8, 5, 18, .68);
+  --input-bg: rgba(5, 3, 13, .55);
+  --border-color: rgba(124, 58, 237, .22);
+  --primary-color: #7C3AED;
+  --secondary-color: #EC4899;
+  --text-main: #F5F3FF;
+  --text-secondary: rgba(226, 220, 240, .72);
+  --text-desc: rgba(205, 197, 220, .64);
+  --text-hint: rgba(190, 182, 205, .55);
+  --box-shadow: 0 12px 40px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+}
+
+html[data-theme="night"] .dashboard-box {
+  background: linear-gradient(135deg, rgba(13, 7, 24, .82), rgba(8, 5, 18, .76));
+  border-color: rgba(124, 58, 237, .22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+  -webkit-backdrop-filter: blur(13px);
+  backdrop-filter: blur(13px);
+}
+
+html[data-theme="night"] .history-controls-bar,
+html[data-theme="night"] .selection-workspace,
+html[data-theme="night"] .comparison-loading-container,
+html[data-theme="night"] .empty-workspace-card,
+html[data-theme="night"] .comparison-total-estimate-card,
+html[data-theme="night"] .modal-card {
+  background: linear-gradient(135deg, rgba(13, 7, 24, .82), rgba(8, 5, 18, .76));
+  border: 1px solid rgba(124, 58, 237, .22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+  -webkit-backdrop-filter: blur(13px);
+  backdrop-filter: blur(13px);
+}
+
+html[data-theme="night"] .history-card,
+html[data-theme="night"] .video-selection-card,
+html[data-theme="night"] .history-item-card {
+  background: linear-gradient(135deg, rgba(13, 7, 24, .82), rgba(8, 5, 18, .76));
+  border-color: rgba(124, 58, 237, .22);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .035);
+}
+
+html[data-theme="night"] .selector-panel-header,
+html[data-theme="night"] .scrollable-container,
+html[data-theme="night"] .chapter-accordion-box,
+html[data-theme="night"] .summary-wrapper,
+html[data-theme="night"] .bar-chart-container,
+html[data-theme="night"] .recommend-row-item {
+  background: rgba(8, 5, 18, .68);
+  border-color: rgba(236, 72, 153, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+html[data-theme="night"] .card-inner,
+html[data-theme="night"] .module-content,
+html[data-theme="night"] .state-container {
+  background: rgba(8, 5, 18, .68);
+  border-color: rgba(236, 72, 153, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+html[data-theme="night"] .text-input,
+html[data-theme="night"] .search-input,
+html[data-theme="night"] .sub-chapter-node-item,
+html[data-theme="night"] input:not([type="radio"]):not([type="checkbox"]),
+html[data-theme="night"] textarea {
+  background: rgba(5, 3, 13, .55);
+  border: 1px solid rgba(124, 58, 237, .20);
+  color: #F5F3FF;
+}
+
+html[data-theme="night"] .text-input:focus,
+html[data-theme="night"] .search-input:focus,
+html[data-theme="night"] input:not([type="radio"]):not([type="checkbox"]):focus,
+html[data-theme="night"] textarea:focus {
+  border-color: rgba(236, 72, 153, .45);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, .10);
+  outline: none;
+}
+
+/* ==================================================
+   NIGHT DROPDOWN & SELECT READABILITY (NIGHT ONLY)
+   ================================================== */
+
+/* 1. Closed Select State */
+html[data-theme="night"] select,
+html[data-theme="night"] .main-select-menu,
+html[data-theme="night"] .lang-dropdown,
+html[data-theme="night"] .admin-filter-select,
+html[data-theme="night"] .slot-model-select,
+html[data-theme="night"] .mini-select,
+html[data-theme="night"] .select-menu-mimic {
+  background: linear-gradient(135deg, rgba(8, 5, 18, 0.96), rgba(13, 7, 24, 0.92)) !important;
+  border: 1px solid rgba(124, 58, 237, 0.45) !important;
+  color: #F5F3FF !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 1 & 13. Focus / Active State */
+html[data-theme="night"] select:focus,
+html[data-theme="night"] .main-select-menu:focus,
+html[data-theme="night"] .lang-dropdown:focus,
+html[data-theme="night"] .admin-filter-select:focus,
+html[data-theme="night"] .slot-model-select:focus,
+html[data-theme="night"] .mini-select:focus,
+html[data-theme="night"] .select-menu-mimic:focus {
+  border-color: rgba(236, 72, 153, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.22), 0 4px 20px rgba(124, 58, 237, 0.25) !important;
+  outline: none !important;
+}
+
+/* 2, 3, 7, 9. Open Dropdown Menu / Normal Options */
+html[data-theme="night"] select option,
+html[data-theme="night"] .main-select-menu option,
+html[data-theme="night"] .lang-dropdown option,
+html[data-theme="night"] .admin-filter-select option,
+html[data-theme="night"] .slot-model-select option,
+html[data-theme="night"] .mini-select option,
+html[data-theme="night"] .select-menu-mimic option {
+  background-color: #080512 !important;
+  color: #EDE9FE !important;
+  padding: 10px 14px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+/* 5. Selected Option State */
+html[data-theme="night"] select option:checked,
+html[data-theme="night"] select option[selected],
+html[data-theme="night"] .main-select-menu option:checked,
+html[data-theme="night"] .lang-dropdown option:checked,
+html[data-theme="night"] .admin-filter-select option:checked,
+html[data-theme="night"] .slot-model-select option:checked,
+html[data-theme="night"] .mini-select option:checked,
+html[data-theme="night"] .select-menu-mimic option:checked {
+  background-color: #230E46 !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+/* 6. Hover Option State */
+html[data-theme="night"] select option:hover,
+html[data-theme="night"] select option:focus,
+html[data-theme="night"] .main-select-menu option:hover,
+html[data-theme="night"] .lang-dropdown option:hover,
+html[data-theme="night"] .admin-filter-select option:hover,
+html[data-theme="night"] .slot-model-select option:hover,
+html[data-theme="night"] .mini-select option:hover,
+html[data-theme="night"] .select-menu-mimic option:hover {
+  background-color: rgba(124, 58, 237, 0.22) !important;
+  color: #FFFFFF !important;
+}
+
+/* Disabled Options */
+html[data-theme="night"] select option:disabled,
+html[data-theme="night"] .main-select-menu option:disabled,
+html[data-theme="night"] .lang-dropdown option:disabled {
+  background-color: #080512 !important;
+  color: rgba(190, 182, 205, 0.45) !important;
+}
+
+html[data-theme="night"] .selector-panel-header,
+html[data-theme="night"] .chapter-summary-bar,
+html[data-theme="night"] .sub-chapter-node-item,
+html[data-theme="night"] .recommend-row-title {
+  border-left-color: #7C3AED;
+}
+
+html[data-theme="night"] .transcript-row.active-row,
+html[data-theme="night"] .candidate-card.selected {
+  background: rgba(124, 58, 237, .10) !important;
+  border-color: rgba(236, 72, 153, .35) !important;
+  border-left-color: #EC4899 !important;
+}
+
+html[data-theme="night"] .btn-outline,
+html[data-theme="night"] .btn-secondary {
+  background-color: rgba(5, 3, 13, .30);
+  border-color: rgba(124, 58, 237, .24);
+}

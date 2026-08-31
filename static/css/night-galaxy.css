@@ -1,0 +1,227 @@
+/* YAMASEE shared night-only galaxy aurora background. */
+.yamasee-night-galaxy {
+  display: none;
+}
+
+html[data-theme="night"] {
+  background: #05030D;
+}
+
+html[data-theme="night"] body {
+  background: transparent !important;
+}
+
+html[data-theme="night"] .bg-mesh {
+  opacity: 0 !important;
+}
+
+html[data-theme="night"] .yamasee-night-galaxy {
+  display: block;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  min-height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 86% 30% at 48% 8%, rgba(79, 31, 138, .22), transparent 72%),
+    radial-gradient(ellipse 76% 28% at 62% 44%, rgba(104, 31, 120, .17), transparent 75%),
+    radial-gradient(ellipse 84% 30% at 32% 78%, rgba(39, 32, 116, .18), transparent 76%),
+    linear-gradient(145deg, #05030D 0%, #080512 43%, #0D0718 72%, #05030D 100%);
+  transition: opacity .35s ease;
+}
+
+.yamasee-galaxy-haze {
+  position: absolute;
+  inset: 0;
+  opacity: .88;
+  background:
+    radial-gradient(ellipse 48% 16% at 27% 18%, rgba(124, 58, 237, .10), transparent 72%),
+    radial-gradient(ellipse 52% 17% at 75% 38%, rgba(236, 72, 153, .09), transparent 74%),
+    radial-gradient(ellipse 44% 14% at 54% 69%, rgba(251, 146, 60, .065), transparent 76%);
+}
+
+.yamasee-aurora-orb {
+  position: absolute;
+  width: var(--orb-size);
+  height: var(--orb-size);
+  transform: translate3d(0, 0, 0) scale(.98);
+  opacity: var(--orb-opacity, .9);
+  animation: yamaseeOrbBreathe var(--orb-duration, 30s) ease-in-out infinite alternate;
+  animation-delay: var(--orb-delay, 0s);
+  will-change: transform, opacity;
+}
+
+.yamasee-aurora-orb::before,
+.yamasee-aurora-orb::after,
+.yamasee-orb-core {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.yamasee-aurora-orb::before {
+  inset: -28%;
+  opacity: .42;
+  background: radial-gradient(circle, var(--orb-halo) 0%, rgba(0,0,0,0) 68%);
+  filter: blur(34px);
+}
+
+.yamasee-aurora-orb::after {
+  inset: 4%;
+  opacity: .74;
+  background: radial-gradient(circle, var(--orb-glow) 0%, var(--orb-mid) 22%, var(--orb-soft) 48%, rgba(0,0,0,0) 74%);
+  filter: blur(18px);
+}
+
+.yamasee-orb-core {
+  z-index: 1;
+  left: 45.5%;
+  top: 45.5%;
+  width: 9%;
+  height: 9%;
+  opacity: .62;
+  background: radial-gradient(circle, rgba(255,255,255,.88) 0%, var(--orb-core) 18%, var(--orb-glow) 48%, rgba(255,255,255,0) 76%);
+  filter: blur(3px);
+  box-shadow: 0 0 28px var(--orb-glow), 0 0 70px var(--orb-mid);
+}
+
+.yamasee-orb-purple {
+  --orb-size: clamp(380px, 44vw, 760px);
+  --orb-opacity: .96;
+  --orb-opacity-low: .87;
+  --orb-duration: 34s;
+  --orb-delay: -7s;
+  --orb-core: #D8B4FE;
+  --orb-glow: rgba(168, 85, 247, .88);
+  --orb-mid: rgba(124, 58, 237, .46);
+  --orb-soft: rgba(91, 33, 182, .19);
+  --orb-halo: rgba(124, 58, 237, .30);
+  left: 0;
+  top: 4%;
+}
+
+.yamasee-orb-pink {
+  --orb-size: clamp(350px, 39vw, 680px);
+  --orb-opacity: .94;
+  --orb-opacity-low: .85;
+  --orb-duration: 29s;
+  --orb-delay: -17s;
+  --orb-core: #FBCFE8;
+  --orb-glow: rgba(236, 72, 153, .91);
+  --orb-mid: rgba(219, 39, 119, .47);
+  --orb-soft: rgba(157, 23, 77, .18);
+  --orb-halo: rgba(236, 72, 153, .28);
+  right: 1%;
+  top: 2%;
+}
+
+.yamasee-orb-blue {
+  --orb-size: clamp(280px, 31vw, 540px);
+  --orb-opacity: .68;
+  --orb-opacity-low: .61;
+  --orb-duration: 38s;
+  --orb-delay: -11s;
+  --orb-core: #BFDBFE;
+  --orb-glow: rgba(59, 130, 246, .72);
+  --orb-mid: rgba(37, 99, 235, .34);
+  --orb-soft: rgba(30, 64, 175, .13);
+  --orb-halo: rgba(59, 130, 246, .20);
+  left: 5%;
+  top: 11%;
+}
+
+.yamasee-orb-orange {
+  --orb-size: clamp(330px, 37vw, 640px);
+  --orb-opacity: .90;
+  --orb-opacity-low: .81;
+  --orb-duration: 32s;
+  --orb-delay: -23s;
+  --orb-core: #FFEDD5;
+  --orb-glow: rgba(251, 146, 60, .88);
+  --orb-mid: rgba(249, 115, 22, .42);
+  --orb-soft: rgba(194, 65, 12, .16);
+  --orb-halo: rgba(251, 146, 60, .24);
+  right: 4%;
+  top: 13%;
+}
+
+.yamasee-orb-magenta-deep {
+  --orb-size: clamp(360px, 41vw, 700px);
+  --orb-opacity: .72;
+  --orb-opacity-low: .65;
+  --orb-duration: 36s;
+  --orb-delay: -4s;
+  --orb-core: #F5D0FE;
+  --orb-glow: rgba(217, 70, 239, .68);
+  --orb-mid: rgba(147, 51, 234, .34);
+  --orb-soft: rgba(88, 28, 135, .13);
+  --orb-halo: rgba(192, 38, 211, .20);
+  left: 24%;
+  top: 49%;
+}
+
+.yamasee-orb-warm-deep {
+  --orb-size: clamp(300px, 34vw, 590px);
+  --orb-opacity: .62;
+  --orb-opacity-low: .56;
+  --orb-duration: 40s;
+  --orb-delay: -28s;
+  --orb-core: #FED7AA;
+  --orb-glow: rgba(249, 115, 22, .64);
+  --orb-mid: rgba(236, 72, 153, .28);
+  --orb-soft: rgba(131, 24, 67, .11);
+  --orb-halo: rgba(249, 115, 22, .17);
+  right: 13%;
+  top: 76%;
+}
+
+.yamasee-star-field {
+  position: absolute;
+  inset: 0;
+}
+
+.yamasee-star {
+  position: absolute;
+  width: var(--star-size, 1px);
+  height: var(--star-size, 1px);
+  border-radius: 50%;
+  opacity: var(--star-opacity, .3);
+  background: var(--star-color, #FFFFFF);
+  box-shadow: 0 0 calc(var(--star-size, 1px) * 3) currentColor;
+}
+
+.yamasee-star.is-bright {
+  animation: yamaseeStarBreathe 9s ease-in-out infinite alternate;
+  animation-delay: var(--star-delay, 0s);
+}
+
+@keyframes yamaseeOrbBreathe {
+  0% { transform: translate3d(-18px, 12px, 0) scale(.96); opacity: var(--orb-opacity-low); }
+  50% { transform: translate3d(20px, -15px, 0) scale(1.025); opacity: var(--orb-opacity); }
+  100% { transform: translate3d(42px, 18px, 0) scale(1.045); opacity: var(--orb-opacity-low); }
+}
+
+@keyframes yamaseeStarBreathe {
+  from { opacity: .28; }
+  to { opacity: var(--star-opacity); }
+}
+
+@media (max-width: 700px) {
+  .yamasee-aurora-orb::before { filter: blur(24px); }
+  .yamasee-aurora-orb::after { filter: blur(13px); }
+  .yamasee-orb-purple { left: -52%; }
+  .yamasee-orb-pink { right: -42%; }
+  .yamasee-orb-blue { left: -30%; }
+  .yamasee-orb-orange { right: -38%; }
+  .yamasee-star:nth-child(n+181) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yamasee-aurora-orb,
+  .yamasee-star.is-bright {
+    animation: none !important;
+  }
+}

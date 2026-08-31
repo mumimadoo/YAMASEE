@@ -1,0 +1,385 @@
+.yamasee-theme-switch {
+  --sky-width: 72px;
+  --sky-height: 32px;
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: var(--sky-width);
+  height: var(--sky-height);
+  border-radius: 999px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.yamasee-theme-switch-input {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.yamasee-theme-switch-track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: inherit;
+  background: linear-gradient(155deg, #78bce8, #6fb2df);
+  box-shadow: inset 0 1px 2px rgba(15, 44, 67, 0.2), 0 2px 7px rgba(24, 74, 110, 0.16);
+  transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.yamasee-theme-orb {
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffe66b, #f5d13d);
+  box-shadow: inset -2px -2px 2px rgba(173, 126, 14, 0.22), 0 1px 4px rgba(91, 63, 7, 0.28), 0 0 0 6px rgba(255, 255, 255, 0.08);
+  transition: left 0.36s cubic-bezier(0.16, 1, 0.3, 1), background 0.45s ease, box-shadow 0.45s ease;
+}
+
+.yamasee-theme-moon {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, #eef1f6, #c4c9d1);
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+.yamasee-theme-moon i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9aa2b4;
+  box-shadow: inset 0 1px 1px rgba(79, 86, 103, 0.25);
+}
+
+.yamasee-theme-moon i:nth-child(1) { top: 5px; left: 5px; }
+.yamasee-theme-moon i:nth-child(2) { top: 12px; left: 12px; width: 4px; height: 4px; }
+.yamasee-theme-moon i:nth-child(3) { top: 5px; left: 14px; width: 3px; height: 3px; }
+
+.yamasee-theme-clouds {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  z-index: 2;
+  width: 34px;
+  height: 15px;
+  opacity: 0.92;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+.yamasee-theme-clouds::before,
+.yamasee-theme-clouds::after,
+.yamasee-theme-clouds i {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  border-radius: 50%;
+  background: #eaf7ff;
+  box-shadow: inset 0 -2px 0 rgba(191, 217, 234, 0.8);
+}
+
+.yamasee-theme-clouds::before { right: 0; width: 22px; height: 13px; }
+.yamasee-theme-clouds::after { right: 16px; width: 17px; height: 11px; }
+.yamasee-theme-clouds i:nth-child(1) { right: 8px; bottom: 1px; width: 14px; height: 14px; }
+.yamasee-theme-clouds i:nth-child(2) { right: 22px; bottom: -1px; width: 10px; height: 10px; }
+.yamasee-theme-clouds i:nth-child(3) { display: none; }
+
+.yamasee-theme-stars {
+  position: absolute;
+  inset: 0 30px 0 5px;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+.yamasee-theme-stars i {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px #d9e6ff;
+}
+
+.yamasee-theme-stars i:nth-child(1) { top: 7px; left: 8px; }
+.yamasee-theme-stars i:nth-child(2) { top: 17px; left: 18px; width: 1px; height: 1px; }
+.yamasee-theme-stars i:nth-child(3) { top: 10px; left: 30px; }
+.yamasee-theme-stars i:nth-child(4) { top: 23px; left: 5px; width: 1px; height: 1px; }
+.yamasee-theme-stars i:nth-child(5) { top: 22px; left: 36px; width: 1px; height: 1px; }
+
+html[data-theme="night"] .yamasee-theme-switch-track {
+  border-color: rgba(217, 230, 255, 0.18);
+  background: linear-gradient(155deg, #1d2134, #171a2a);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.48), 0 2px 8px rgba(4, 6, 18, 0.32);
+}
+
+html[data-theme="night"] .yamasee-theme-orb {
+  left: calc(100% - 27px);
+  background: #c4c9d1;
+  box-shadow: inset -2px -2px 2px rgba(77, 84, 100, 0.28), 0 1px 4px rgba(0, 0, 0, 0.4), 0 0 0 6px rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="night"] .yamasee-theme-moon { opacity: 1; transform: translateX(0); }
+html[data-theme="night"] .yamasee-theme-clouds { opacity: 0; transform: translateY(24px); }
+html[data-theme="night"] .yamasee-theme-stars { opacity: 1; transform: translateY(0); }
+
+.yamasee-theme-switch-input:focus-visible + .yamasee-theme-switch-track {
+  outline: 3px solid var(--primary, #7c3aed);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .yamasee-theme-switch { --sky-width: 60px; --sky-height: 29px; }
+  .yamasee-theme-orb { top: 4px; width: 19px; height: 19px; }
+  html[data-theme="night"] .yamasee-theme-orb { left: calc(100% - 24px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yamasee-theme-switch-track,
+  .yamasee-theme-orb,
+  .yamasee-theme-moon,
+  .yamasee-theme-clouds,
+  .yamasee-theme-stars { transition-duration: 0.01ms !important; }
+}
+
+/* ==========================================================================
+   SKY TOGGLE SWITCH COMPONENT (Reference: ปุ่มd_n.txt)
+   ========================================================================== */
+
+.theme-switch {
+  --toggle-size: 12px;
+  --container-width: 5.625em; /* 67.5px - Matches target 66-74px */
+  --container-height: 2.5em; /* 30px - Matches target 30-34px */
+  --container-radius: 6.25em;
+  --container-light-bg: #3D7EAE;
+  --container-night-bg: #1D1F2C;
+  --circle-container-diameter: 3.375em;
+  --sun-moon-diameter: 2.125em;
+  --sun-bg: #ECCA2F;
+  --moon-bg: #C4C9D1;
+  --spot-color: #959DB1;
+  --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+  --stars-color: #fff;
+  --clouds-color: #F3FDFF;
+  --back-clouds-color: #AACADF;
+  --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+  --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  flex: 0 0 auto;
+}
+
+/* Protect the component from legacy page-local .theme-switch sizing rules. */
+.theme-switch.theme-switch {
+  display: inline-flex;
+  width: var(--container-width);
+  height: var(--container-height);
+}
+
+.theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-size: var(--toggle-size);
+}
+
+.theme-switch__container {
+  width: var(--container-width);
+  height: var(--container-height);
+  background-color: var(--container-light-bg);
+  border-radius: var(--container-radius);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+  transition: var(--transition);
+  position: relative;
+}
+
+.theme-switch__container::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+  border-radius: var(--container-radius);
+}
+
+.theme-switch > input.theme-switch__checkbox {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+.theme-switch__circle-container {
+  width: var(--circle-container-diameter);
+  height: var(--circle-container-diameter);
+  background-color: rgba(255, 255, 255, 0.1);
+  position: absolute;
+  left: var(--circle-container-offset);
+  top: var(--circle-container-offset);
+  border-radius: var(--container-radius);
+  box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+  display: flex;
+  transition: var(--circle-transition);
+  pointer-events: none;
+}
+
+.theme-switch__sun-moon-container {
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  width: var(--sun-moon-diameter);
+  height: var(--sun-moon-diameter);
+  margin: auto;
+  border-radius: var(--container-radius);
+  background-color: var(--sun-bg);
+  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+  filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.theme-switch__moon {
+  display: block;
+  transform: translateX(100%);
+  width: 100%;
+  height: 100%;
+  background-color: var(--moon-bg);
+  border-radius: inherit;
+  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+  transition: var(--transition);
+  position: relative;
+}
+
+.theme-switch__spot {
+  position: absolute;
+  top: 0.75em;
+  left: 0.312em;
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: var(--container-radius);
+  background-color: var(--spot-color);
+  box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+}
+
+.theme-switch__spot:nth-of-type(2) {
+  width: 0.375em;
+  height: 0.375em;
+  top: 0.937em;
+  left: 1.375em;
+}
+
+.theme-switch__spot:nth-last-of-type(3) {
+  width: 0.25em;
+  height: 0.25em;
+  top: 0.312em;
+  left: 0.812em;
+}
+
+.theme-switch__clouds {
+  width: 1.25em;
+  height: 1.25em;
+  background-color: var(--clouds-color);
+  border-radius: var(--container-radius);
+  position: absolute;
+  bottom: -0.625em;
+  left: 0.312em;
+  box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+  transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+}
+
+.theme-switch__stars-container {
+  position: absolute;
+  color: var(--stars-color);
+  top: -100%;
+  left: 0.312em;
+  width: 2.75em;
+  height: auto;
+  transition: var(--transition);
+}
+
+/* Actions & Night Mode State Synchronizations */
+.theme-switch__checkbox:checked + .theme-switch__container,
+html[data-theme="night"] .theme-switch__container {
+  background-color: var(--container-night-bg);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container,
+html[data-theme="night"] .theme-switch__circle-container {
+  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover,
+html[data-theme="night"] .theme-switch__circle-container:hover {
+  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em);
+}
+
+.theme-switch__circle-container:hover {
+  left: calc(var(--circle-container-offset) + 0.187em);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon,
+html[data-theme="night"] .theme-switch__moon {
+  transform: translate(0);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds,
+html[data-theme="night"] .theme-switch__clouds {
+  bottom: -4.062em;
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container,
+html[data-theme="night"] .theme-switch__stars-container {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.theme-switch__checkbox:focus-visible + .theme-switch__container {
+  outline: 2px solid var(--primary, #FF8A4D);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .theme-switch {
+    --toggle-size: 10.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch__container,
+  .theme-switch__circle-container,
+  .theme-switch__sun-moon-container,
+  .theme-switch__moon,
+  .theme-switch__clouds,
+  .theme-switch__stars-container {
+    transition-duration: 0.01ms !important;
+  }
+}
